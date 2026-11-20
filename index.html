@@ -511,7 +511,7 @@ function exportData(){
 function importData(file){
   const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!d.settings||!d.progress)throw 0;snap();state=normalize(d);persist();render();toast('Data dipulihkan dari cadangan',true)}catch(e){toast('File cadangan tidak dikenali')}};r.readAsText(file);
 }
-const APPV='14';
+const APPV='16';
 function vSync(){
   const on=gh.token&&gh.id;
   return '<div class="card"><h2>🔄 Sinkron antar perangkat & cadangan</h2>'+
@@ -1085,7 +1085,7 @@ function vBeranda(){
 /* ===== Rekap Ibadah Harian ===== */
 const FARDHU=['Subuh','Dzuhur','Ashar','Maghrib','Isya'];
 const IBI=[
- {id:'rawatib',g:'Shalat Sunnah',n:'Rawatib',haidOff:1},
+ {id:'rawatib',g:'Shalat Sunnah',n:'Rawatib',haidOff:1,sub:'centang per waktu di bawah'},
  {id:'dhuha',g:'Shalat Sunnah',n:'Dhuha',haidOff:1},
  {id:'tahajud',g:'Shalat Sunnah',n:'Tahajud / qiyamul lail',haidOff:1},
  {id:'witir',g:'Shalat Sunnah',n:'Witir',haidOff:1},
@@ -1101,6 +1101,8 @@ const IBI=[
  {id:'ilmu',g:'Amal Lainnya',n:'Kajian / membaca ilmu'}
 ];
 let ibDate=null,ibMode='hari';
+const RAW=[{k:'qSubuh',n:'Qabliyah Subuh',r:'2',m:1},{k:'qDzuhur',n:'Qabliyah Dzuhur',r:'4/2',m:1},{k:'bDzuhur',n:"Ba'diyah Dzuhur",r:'2',m:1},{k:'bMaghrib',n:"Ba'diyah Maghrib",r:'2',m:1},{k:'bIsya',n:"Ba'diyah Isya",r:'2',m:1},{k:'qAshar',n:'Qabliyah Ashar',r:'4/2'},{k:'qMaghrib',n:'Qabliyah Maghrib',r:'2'},{k:'qIsya',n:'Qabliyah Isya',r:'2'}];
+function rwCount(d){const D=ibDay(d),rw=D.rw||{};return{m:RAW.filter(x=>x.m&&rw[x.k]).length,g:RAW.filter(x=>!x.m&&rw[x.k]).length,any:!!D.rw}}
 const IBCAT={rawatib:'sunnah',dhuha:'sunnah',tahajud:'sunnah',witir:'sunnah',tilawah:'ngaji',ziyadah:'hafalan',murajaah:'ngaji',tahsin:'ngaji',dzpagi:'sunnah',dzpetang:'sunnah',dzsalah:'sunnah',sedekah:'sunnah',puasa:'sunnah',ilmu:'sunnah'};
 const CATS=[['wajib','Ibadah wajib','🕌','shalat fardhu 5 waktu'],['sunnah','Ibadah sunnah','🌿','shalat sunnah, dzikir, sedekah, puasa, dll'],['hafalan','Hafalan','📖','target hafalan baru sesuai jadwal'],['ngaji','Mengaji & murajaah','🔁','tilawah, murajaah, tahsin']];
 function ibCat(d,c){const D=ibDay(d);
@@ -1118,6 +1120,7 @@ function ibVal(d,it){
   if(it.auto==='ziyadah'||it.auto==='murajaah')return state.log.some(e=>e.date===d&&e.type===it.auto)?1:0;
   if(it.auto==='pagi'||it.auto==='petang')return (state.dzLog[d]||{})[it.auto]?1:0;
   if(it.auto==='salah')return Math.min(1,((state.dzLog[d]||{}).shalat||[]).length/5);
+  if(it.id==='rawatib'){const c=rwCount(d);if(c.any&&(c.m||c.g))return Math.min(1,c.m/5+(c.m<5?c.g*.1:0));return k.rawatib?1:0}
   if(it.num)return +k[it.id]>0?1:0;
   return k[it.id]?1:0;
 }
@@ -1150,8 +1153,11 @@ function vIbDayV(){
       h+='<div class="ibrow"><div><div class="nm">'+esc(it.n)+'</div>'+(it.sub?'<div class="sub">'+esc(it.sub)+'</div>':'')+(it.auto==='salah'?'<div class="sub">'+(((state.dzLog[d]||{}).shalat||[]).length)+'/5 shalat</div>':'')+(it.auto?'<div class="sub">otomatis dari tab '+(it.auto==='ziyadah'||it.auto==='murajaah'?'Hari Ini':'Dzikir')+'</div>':'')+'</div>';
       if(it.num)h+='<div class="row" style="flex-wrap:nowrap"><input type="number" min="0" class="ibnum" data-ibnum="'+it.id+'" value="'+(k[it.id]||'')+'" placeholder="0"><span class="small muted">'+it.num+'</span></div>';
       else if(it.auto)h+='<button class="tg auto'+(v>=1?' on':'')+'" data-act="ibgo" data-to="'+it.auto+'">'+(v>=1?'✓ Selesai':v>0?Math.round(v*5)+'/5 ›':'Buka ›')+'</button>';
+      else if(it.id==='rawatib'){const c=rwCount(d);h+='<b class="small" style="color:#3f7a5a;white-space:nowrap">'+c.m+'/5'+(c.g?' +'+c.g:'')+'</b>'}
       else h+='<button class="tg'+(v?' on':'')+'" data-act="ibk" data-id="'+it.id+'">✓</button>';
-      h+='</div>'});
+      h+='</div>';
+      if(it.id==='rawatib'){const rw=D.rw||{},ch=x=>'<span class="shchip'+(rw[x.k]?' on':'')+'" data-act="ibrw" data-k="'+x.k+'">'+(rw[x.k]?'✓ ':'')+x.n+' <span class="small" style="opacity:.65">'+x.r+'</span></span>';h+='<div style="padding:2px 0 10px"><div class="small" style="font-weight:700;margin:2px 0 4px">Muakkad (sangat ditekankan, 12 rakaat)</div><div class="shchips">'+RAW.filter(x=>x.m).map(ch).join('')+'</div>'+'<div class="small" style="font-weight:700;margin:10px 0 4px">Ghairu muakkad (tambahan)</div><div class="shchips">'+RAW.filter(x=>!x.m).map(ch).join('')+'</div>'+'<div class="hint">Angka kecil = jumlah rakaat. Persentase rawatib dihitung dari 5 rawatib muakkad. Qabliyah Subuh paling ditekankan, Nabi ﷺ tidak pernah meninggalkannya bahkan saat safar.</div></div>'}
+    });
     h+='</div>';
   });
   h+='<div class="card"><h2>📝 Catatan / muhasabah</h2><textarea rows="3" data-ibnote="1" placeholder="Apa yang disyukuri dan ingin diperbaiki hari ini?">'+esc(D.note||'')+'</textarea>'+
@@ -1259,9 +1265,12 @@ pl('plClose').addEventListener('click',()=>{au.pause();pl('player').classList.re
 /* ===== Dzikir ===== */
 let DZ=null,dzErr=false,dzSess=null;
 const SHALAT=['Subuh','Dzuhur','Ashar','Maghrib','Isya'];
-const DZNAME={pagi:'Dzikir Pagi',petang:'Dzikir Petang',salah:'Dzikir Setelah Shalat'};
+const DZNAME={pagi:'Dzikir Pagi',petang:'Dzikir Petang',salah:'Dzikir Setelah Shalat',sunnah:'Doa Dhuha, Tahajud & Witir'};
+let dzW=null,dzFull=false;
+function defW(){const h=new Date().getHours();return h<11&&h>=3?'Subuh':h<15&&h>=11?'Dzuhur':h<18&&h>=15?'Ashar':h===18?'Maghrib':'Isya'}
+function dzVis(ss){if(!DZ||!DZ[ss])return[];const L=DZ[ss].map((x,i)=>i);if(ss!=='salah')return L;const w=dzW||defW(),ring=(w==='Dzuhur'||w==='Ashar')&&!dzFull;return L.filter(i=>{const x=DZ[ss][i];return!(x.only&&x.only!==w)&&(!ring||x.inti)})}
 function loadDz(){if(DZ||dzErr)return;fetch('dzikir.json').then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>{DZ=j;if(tab==='dzikir'||tab==='today')render()}).catch(()=>{dzErr=true;if(tab==='dzikir')render()})}
-function dzCounts(){const t=todayStr();if(state.dz.date!==t){state.dz={date:t,pagi:{},petang:{},salah:{}}}return state.dz}
+function dzCounts(){const t=todayStr();if(state.dz.date!==t){state.dz={date:t,pagi:{},petang:{},salah:{},sunnah:{}}}if(!state.dz.sunnah)state.dz.sunnah={};return state.dz}
 function dzLogToday(){return state.dzLog[todayStr()]||{}}
 function dzSetLog(k,v){const t=todayStr();state.dzLog[t]=Object.assign({},state.dzLog[t]||{},{[k]:v});
   const keys=Object.keys(state.dzLog).sort();while(keys.length>400)delete state.dzLog[keys.shift()]}
@@ -1271,34 +1280,35 @@ const fmtAr=t=>esc(t).replace(/\((\d+)\)/g,(m,n)=>'<span class="num">﴿'+arNum(
 function vDzikir(){
   loadDz();const ss=dzSess||defaultSess(),st=state.settings,c=dzCounts()[ss]||{},L=dzLogToday();
   let h='<div class="card"><h2>📿 Dzikir sesuai sunnah</h2><p class="muted small" style="margin:0">Susunan pagi–petang mengikuti Ustadz Yazid bin Abdul Qadir Jawas rahimahullah; semua dari hadits shahih/hasan.</p>'+
-   '<div class="seg2">'+['pagi','petang','salah'].map(k=>'<button class="'+(k===ss?'on':'')+'" data-act="dzsess" data-s="'+k+'">'+(k==='pagi'?'🌅 Pagi':k==='petang'?'🌇 Petang':'🤲 Setelah Shalat')+(k!=='salah'&&L[k]?' ✓':'')+'</button>').join('')+'</div>'+
-   '<div class="small muted">'+(ss==='pagi'?'Waktu afdhal: antara Subuh hingga terbit matahari. Jika sibuk atau lupa, boleh dibaca setelahnya.':ss==='petang'?'Waktu afdhal: antara Ashar hingga terbenam matahari. Jika sibuk atau lupa, boleh dibaca setelahnya.':'Dibaca setelah salam shalat fardhu, lalu lanjutkan dengan doa pribadi di bagian bawah.')+'</div>'+
+   '<div class="seg2">'+['pagi','petang','salah','sunnah'].map(k=>'<button class="'+(k===ss?'on':'')+'" data-act="dzsess" data-s="'+k+'">'+(k==='pagi'?'🌅 Pagi':k==='petang'?'🌇 Petang':k==='salah'?'🤲 Setelah Shalat':'🌙 Dhuha & Malam')+((k==='pagi'||k==='petang')&&L[k]?' ✓':'')+'</button>').join('')+'</div>'+
+   '<div class="small muted">'+(ss==='pagi'?'Waktu afdhal: antara Subuh hingga terbit matahari. Jika sibuk atau lupa, boleh dibaca setelahnya.':ss==='petang'?'Waktu afdhal: antara Ashar hingga terbenam matahari. Jika sibuk atau lupa, boleh dibaca setelahnya.':ss==='sunnah'?'Doa sesuai sunnah setelah shalat Dhuha, saat shalat malam (tahajud), dan saat witir.':'Dibaca setelah salam shalat fardhu, lalu lanjutkan dengan doa pribadi di bagian bawah.')+'</div>'+
    '<div class="readbar"><span class="toggle'+(st.dzTr!==false?' on':'')+'" data-act="dztg" data-k="dzTr">Terjemahan</span><span class="toggle'+(st.dzLt?' on':'')+'" data-act="dztg" data-k="dzLt">Latin</span><span class="sizes"><button class="sz" data-act="qsz" data-v="-1">A−</button><button class="sz" data-act="qsz" data-v="1">A+</button></span><button class="btn btn-ghost" data-act="dzreset">↺ Ulang hitungan</button></div>';
-  if(ss==='salah'){const sh=L.shalat||[];h+='<div class="small" style="font-weight:700;margin:6px 0 4px">Sudah dzikir setelah shalat:</div><div class="shchips">'+SHALAT.map(n=>'<span class="shchip'+(sh.includes(n)?' on':'')+'" data-act="dzshalat" data-n="'+n+'">'+(sh.includes(n)?'✓ ':'')+n+'</span>').join('')+'</div><div class="hint">Ketuk nama shalat setelah selesai berdzikir. Hitungan otomatis diulang untuk shalat berikutnya.</div>'}
+  if(ss==='salah'){const sh=L.shalat||[],w=dzW||defW(),ring=w==='Dzuhur'||w==='Ashar';h+='<div class="small" style="font-weight:700;margin:10px 0 4px">Bacaan untuk shalat:</div><div class="shchips">'+SHALAT.map(n=>'<span class="shchip'+(n===w?' on':'')+'" data-act="dzw" data-n="'+n+'">'+n+'</span>').join('')+'</div>'+(ring?'<div class="hint">'+(dzFull?'Menampilkan bacaan lengkap. ':'Versi ringkas untuk '+w+': istighfar, Allahumma antas salam, tasbih-tahmid-takbir, dan ayat kursi. ')+'<a href="#" data-act="dzfull" style="font-weight:700">'+(dzFull?'Ringkas lagi':'Tampilkan lengkap')+'</a></div>':'');h+='<div class="small" style="font-weight:700;margin:6px 0 4px">Sudah dzikir setelah shalat:</div><div class="shchips">'+SHALAT.map(n=>'<span class="shchip'+(sh.includes(n)?' on':'')+'" data-act="dzshalat" data-n="'+n+'">'+(sh.includes(n)?'✓ ':'')+n+'</span>').join('')+'</div><div class="hint">Ketuk nama shalat setelah selesai berdzikir. Hitungan otomatis diulang untuk shalat berikutnya.</div>'}
   h+='</div>';
   if(!DZ)return h+'<div class="card empty">'+(dzErr?'Bacaan dzikir belum bisa dimuat. Coba buka ulang halaman.':'Memuat bacaan…')+'</div>';
-  const list=DZ[ss];let doneN=0;list.forEach((x,i)=>{if((c[i]||0)>=nOf(ss,i))doneN++});
-  h+='<div class="card" style="padding:12px 16px"><div class="daybar"><b>'+DZNAME[ss]+'</b><span class="small muted" id="dzProg">'+doneN+'/'+list.length+' bacaan tuntas</span></div><div class="dzbar"><i id="dzBar" style="width:'+(doneN/list.length*100)+'%"></i></div></div>';
-  list.forEach((x,i)=>{const N=nOf(ss,i),k=Math.min(c[i]||0,N),dn=k>=N;
+  const list=DZ[ss]||[],V=dzVis(ss);let doneN=0;V.forEach(i=>{if((c[i]||0)>=nOf(ss,i))doneN++});
+  h+='<div class="card" style="padding:12px 16px"><div class="daybar"><b>'+DZNAME[ss]+'</b><span class="small muted" id="dzProg">'+doneN+'/'+V.length+' bacaan tuntas</span></div><div class="dzbar"><i id="dzBar" style="width:'+(doneN/(V.length||1)*100)+'%"></i></div></div>';
+  V.forEach((i,vi)=>{const x=list[i],N=nOf(ss,i),k=Math.min(c[i]||0,N),dn=k>=N;
     if(x.sec)h+='<div class="plan-wk" style="margin:20px 4px 8px;font-size:12.5px">'+esc(x.sec)+'</div>';
-    h+='<div class="card dzc'+(dn?' done':'')+'" id="dz'+i+'"><div class="dzt"><b>'+(i+1)+'. '+esc(x.t)+'</b>'+(x.doa?'<span class="badge t-murajaah">doa</span>':'<span class="badge t-ringan">'+N+'×</span>')+'</div>'+
+    h+='<div class="card dzc'+(dn?' done':'')+'" id="dz'+i+'"><div class="dzt"><b>'+(vi+1)+'. '+esc(x.t)+'</b>'+(x.doa?'<span class="badge t-murajaah">doa</span>':'<span class="badge t-ringan">'+N+'×</span>')+'</div>'+
       (x.pre?'<div class="q" style="font-size:20px;margin-bottom:0;color:#857565">'+esc(x.pre)+'</div>':'')+'<div class="q">'+fmtAr(x.ar)+'</div>'+
       (st.dzLt?'<div class="lt">'+esc(x.lt)+'</div>':'')+
       (st.dzTr!==false?'<div class="idt">'+esc(x.id)+'</div>':'')+
       '<details><summary>Keutamaan & sumber</summary>'+(x.note?'<div style="margin-top:4px"><b>Anjuran:</b> '+esc(x.note)+'</div>':'')+(x.fw?'<div style="margin-top:4px">'+esc(x.fw)+'</div>':'')+(x.src?'<div style="margin-top:4px"><b>Sumber:</b> '+esc(x.src)+'</div>':'')+'</details>'+
       (x.opts?'<div class="shchips" style="margin-top:10px"><span class="small muted" style="align-self:center">Target:</span>'+x.opts.map(o=>'<span class="shchip'+(o===N?' on':'')+'" data-act="dzopt" data-i="'+i+'" data-v="'+o+'">'+o+'×</span>').join('')+'</div>':'')+'<div class="cnt"><button class="minus" data-act="dzminus" data-i="'+i+'" title="Kurangi">−</button><button class="tap" data-act="dztap" data-i="'+i+'">'+(dn?'✓ Selesai ('+N+'/'+N+')':N===1?'Ketuk bila sudah dibaca':'Ketuk tiap bacaan · '+k+'/'+N)+'</button></div></div>'});
-  if(ss!=='salah')h+='<div class="card" style="text-align:center">'+(L[ss]?'<div class="done-box">✓ '+DZNAME[ss]+' hari ini sudah tuntas. Alhamdulillah.</div>':'<button class="btn btn-green" data-act="dzdone">✓ Tandai '+DZNAME[ss].toLowerCase()+' selesai</button>')+'</div>';
+  if(ss==='pagi'||ss==='petang')h+='<div class="card" style="text-align:center">'+(L[ss]?'<div class="done-box">✓ '+DZNAME[ss]+' hari ini sudah tuntas. Alhamdulillah.</div>':'<button class="btn btn-green" data-act="dzdone">✓ Tandai '+DZNAME[ss].toLowerCase()+' selesai</button>')+'</div>';
   h+='<div class="hint" style="text-align:center;margin-bottom:20px">Rujukan: “Dzikir Pagi dan Petang”, Ustadz Yazid bin Abdul Qadir Jawas (almanhaj.or.id) & Hisnul Muslim. Teks Arab: dataset fitrahive/dua-dhikr (MIT). Bacaan berderajat lemah tidak dimasukkan.</div>';
   return h;
 }
 function dzUpdate(ss,i){
   const x=DZ[ss][i],N=nOf(ss,i),c=state.dz[ss],k=Math.min(c[i]||0,N),dn=k>=N,card=document.getElementById('dz'+i);if(!card)return;
   card.classList.toggle('done',dn);card.querySelector('.tap').textContent=dn?'✓ Selesai ('+N+'/'+N+')':N===1?'Ketuk bila sudah dibaca':'Ketuk tiap bacaan · '+k+'/'+N;
-  let doneN=0;DZ[ss].forEach((y,j)=>{if((c[j]||0)>=nOf(ss,j))doneN++});
-  document.getElementById('dzProg').textContent=doneN+'/'+DZ[ss].length+' bacaan tuntas';document.getElementById('dzBar').style.width=(doneN/DZ[ss].length*100)+'%';
-  if(dn&&k===N&&(c[i]||0)===N){setTimeout(()=>{const nx=document.getElementById('dz'+(i+1));if(nx)nx.scrollIntoView({behavior:'smooth',block:'start'})},250)}
-  if(doneN===DZ[ss].length){
+  const V=dzVis(ss);let doneN=0;V.forEach(j=>{if((c[j]||0)>=nOf(ss,j))doneN++});
+  document.getElementById('dzProg').textContent=doneN+'/'+V.length+' bacaan tuntas';document.getElementById('dzBar').style.width=(doneN/(V.length||1)*100)+'%';
+  if(dn&&k===N&&(c[i]||0)===N){setTimeout(()=>{const nx=document.getElementById('dz'+V[V.indexOf(i)+1]);if(nx)nx.scrollIntoView({behavior:'smooth',block:'start'})},250)}
+  if(doneN===V.length){
     if(ss==='salah'){toast('MasyaAllah, dzikir tuntas. Ketuk nama shalatnya untuk menandai.')}
+    else if(ss==='sunnah'){toast('MasyaAllah, semua bacaan tuntas 🌙',true)}
     else if(!dzLogToday()[ss]){snap();dzSetLog(ss,true);persist();toast('MasyaAllah, '+DZNAME[ss].toLowerCase()+' tuntas! 🌿',true);render()}
   }
 }
@@ -1376,6 +1386,7 @@ document.addEventListener('click',e=>{
   if(a==='ibtoday'){ibDate=todayStr();render();return}
   if(a==='ibday'){ibDate=t.dataset.d;ibMode='hari';render();window.scrollTo({top:0,behavior:'smooth'});return}
   if(a==='ibf'){snap();const D=ibDay(ibDate),s2=Object.assign({},D.s||{}),v=((s2[t.dataset.f]||0)+1)%3;if(v)s2[t.dataset.f]=v;else delete s2[t.dataset.f];ibSet(ibDate,{s:s2});persist();render();return}
+  if(a==='ibrw'){snap();const D=ibDay(ibDate),rw=Object.assign({},D.rw||{}),kk=t.dataset.k;if(rw[kk])delete rw[kk];else rw[kk]=1;const k=Object.assign({},D.k||{});delete k.rawatib;ibSet(ibDate,{rw,k});persist();render();return}
   if(a==='ibk'){snap();const k=Object.assign({},ibDay(ibDate).k||{});if(k[t.dataset.id])delete k[t.dataset.id];else k[t.dataset.id]=1;ibSet(ibDate,{k});persist();render();return}
   if(a==='ibhaid'){snap();ibSet(ibDate,{haid:!ibDay(ibDate).haid});persist();render();return}
   if(a==='ibgo'){const to=t.dataset.to;if(to==='ziyadah'||to==='murajaah'){tab='today'}else{tab='dzikir';dzSess=to}try{localStorage.setItem(LS+'-tab',tab)}catch(x){}render();window.scrollTo({top:0,behavior:'smooth'});return}
@@ -1392,13 +1403,15 @@ document.addEventListener('click',e=>{
   if(a==='pasteok'){try{const d=JSON.parse(document.getElementById('pasteBox').value);if(!d||!d.settings||!d.progress)throw 0;snap();state=normalize(d);closeModal();persist();render();toast('Data berhasil dipindahkan ✓',true)}catch(x){toast('Data tidak dikenali. Pastikan tersalin utuh.')}return}
   if(a==='opendz'){dzSess=t.dataset.s;tab='dzikir';try{localStorage.setItem(LS+'-tab',tab)}catch(x){}render();window.scrollTo({top:0,behavior:'smooth'});return}
   if(a==='dzsess'){dzSess=t.dataset.s;render();return}
+  if(a==='dzw'){dzW=t.dataset.n;dzFull=false;render();return}
+  if(a==='dzfull'){e.preventDefault&&e.preventDefault();dzFull=!dzFull;render();return}
   if(a==='dztg'){const k=t.dataset.k;state.settings[k]=k==='dzTr'?state.settings.dzTr===false:!state.settings.dzLt;persist();render();return}
   if(a==='dztap'||a==='dzminus'){const ss=dzSess||defaultSess(),i=+t.dataset.i,c=dzCounts()[ss],n=nOf(ss,i);c[i]=Math.max(0,Math.min(n,(c[i]||0)+(a==='dztap'?1:-1)));persist();if(navigator.vibrate&&a==='dztap')try{navigator.vibrate(15)}catch(x){};dzUpdate(ss,i);return}
   if(a==='dzopt'){const ss=dzSess||defaultSess(),x=DZ[ss][+t.dataset.i];state.settings.dzOpt=Object.assign({},state.settings.dzOpt||{},{[ss+'-'+x.t]:+t.dataset.v});persist();render();return}
   if(a==='dzreset'){const ss=dzSess||defaultSess();snap();dzCounts()[ss]={};persist();render();toast('Hitungan diulang dari awal',true);return}
   if(a==='dzdone'){const ss=dzSess||defaultSess();snap();dzSetLog(ss,true);persist();render();toast(DZNAME[ss]+' ditandai selesai',true);return}
   if(a==='dzshalat'){const n=t.dataset.n,L=dzLogToday(),sh=[...(L.shalat||[])];snap();const was=sh.includes(n);
-    if(sh.includes(n)){dzSetLog('shalat',sh.filter(x=>x!==n))}else{sh.push(n);dzSetLog('shalat',SHALAT.filter(x=>sh.includes(x)));dzCounts().salah={}}
+    if(sh.includes(n)){dzSetLog('shalat',sh.filter(x=>x!==n))}else{sh.push(n);dzSetLog('shalat',SHALAT.filter(x=>sh.includes(x)));dzCounts().salah={};const nx=SHALAT.find(x=>!sh.includes(x)&&SHALAT.indexOf(x)>SHALAT.indexOf(n));if(nx){dzW=nx;dzFull=false}}
     persist();render();toast(!was?'Dzikir setelah '+n+' dicatat':'Tanda '+n+' dibatalkan',true);return}
   if(a==='openread'){readNo=+t.dataset.no;hl={no:readNo,from:+t.dataset.from,to:+t.dataset.to};tab='baca';try{localStorage.setItem(LS+'-tab',tab)}catch(x){}render();setTimeout(()=>{const el=document.getElementById('ay'+hl.from);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},250);return}
   if(a==='play'){playSurah(+t.dataset.no);return}
