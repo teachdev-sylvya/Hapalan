@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Program Hafalan Juz 30 — Devy</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#e6dcff">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbf8fd; --card:#ffffff; --ink:#3b3654; --muted:#7a7592; --line:#ece6f4;
+  --navy:#6a5cc7; --blue:#8b7fe0; --sky:#efeafd; --gold:#e0a96d; --gold-soft:#fff1e3;
+  --green:#3f9b73; --green-soft:#e2f6ec; --red:#d46a7e; --red-soft:#fde8ee; --amber:#c27c3e; --amber-soft:#fff3e6;
+  --pink:#fde4ef; --mint:#dcf5ea; --peach:#ffe9dc; --lav:#ebe5ff; --sky2:#e0f0fc;
+  --radius:18px; --shadow:0 1px 2px rgba(90,70,140,.05),0 6px 18px rgba(90,70,140,.07);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:15px;line-height:1.5}
+.ar{font-family:'Amiri',serif;direction:rtl}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:880px;margin:0 auto;padding:16px 14px 80px}
+header.top{background:linear-gradient(135deg,#e6dcff 0%,#fde2ef 50%,#d9f3e8 100%);color:#3b3654;border-radius:20px;padding:18px 18px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+header.top:after{content:"";position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,226,200,.9),transparent 70%)}
+.top h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-.01em}
+.top .sub{opacity:.85;font-size:13px;margin-top:2px}
+.top .ar-title{font-size:24px;opacity:.95;margin-top:6px}
+.toprow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;position:relative;z-index:1}
+.tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:600}
+.status{background:rgba(255,255,255,.7);color:#5a4fa8}
+.btn-undo{background:#fff;color:var(--navy);box-shadow:0 2px 6px rgba(106,92,199,.15);border:0;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-undo:disabled{opacity:.45;cursor:default}
+.progress-hero{margin-top:14px;position:relative;z-index:1}
+.bar{height:10px;background:rgba(255,255,255,.75);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,#b9adf5,#f5a9c8,#9fdcbf);border-radius:99px;transition:width .4s}
+.hero-nums{display:flex;justify-content:space-between;font-size:12.5px;margin-top:6px;opacity:.92}
+nav.tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0 12px;padding-bottom:2px;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font-weight:600;font-size:13.5px;cursor:pointer;color:var(--muted)}
+.tab.on{background:var(--lav);border-color:#cfc4fa;color:#4b3fa0}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:12px;border:1px solid #edf1f7}
+.card h2{margin:0 0 4px;font-size:16px;font-weight:800}
+.card h3{margin:14px 0 6px;font-size:14px;font-weight:700}
+.muted{color:var(--muted)}
+.small{font-size:12.5px}
+.daybar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700}
+.t-full{background:var(--green-soft);color:var(--green)}
+.t-ringan{background:var(--sky);color:var(--blue)}
+.t-murajaah{background:var(--gold-soft);color:var(--amber)}
+.t-libur{background:#f1eef6;color:#7f7896}
+.t-murajaah{background:var(--peach)}
+.target{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,#f3efff,#e4f4fd);border:1px solid #ddd5fb;border-radius:14px;padding:14px;margin:10px 0}
+.target .nm{font-weight:800;font-size:17px}
+.target .ar{font-size:30px;color:var(--navy);line-height:1}
+.steps{margin:8px 0 0;padding-left:20px;color:var(--muted);font-size:13.5px}
+.steps li{margin:2px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer;font-size:14px}
+.btn-primary{background:#cfc4fa;color:#3d3190}
+.btn-green{background:#bfeed6;color:#1f6b49}
+.btn-soft{background:var(--sky);color:var(--navy)}
+.btn-ghost{background:transparent;color:var(--blue);padding:8px 6px}
+.btn-red{background:var(--red-soft);color:var(--red)}
+.btn-q{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+.btn-q[data-q=lancar]{background:var(--mint);border-color:#bfe8d4}.btn-q[data-q=salah]{background:var(--peach);border-color:#fad3bd}.btn-q[data-q=ulang]{background:var(--pink);border-color:#f7c6da}
+.btn-q:hover{border-color:var(--blue)}
+input[type=text],input[type=password],input[type=number],input[type=date],select,textarea{border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue)}
+.done-box{background:var(--green-soft);color:#155f3f;border-radius:12px;padding:10px 12px;font-weight:600;font-size:14px;margin:8px 0}
+.info-box{background:var(--gold-soft);color:#7a5413;border-radius:12px;padding:10px 12px;font-size:13.5px;margin:8px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
+.chip{background:var(--sky2);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:13px}
+.chip.flag{background:var(--red-soft);border-color:#f5c6c0;color:#8f2a1f}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{background:#fff;border:1px solid rgba(255,255,255,.8);border-radius:14px;padding:10px 12px;box-shadow:var(--shadow)}
+.stat:nth-child(1){background:var(--lav)}.stat:nth-child(2){background:var(--mint)}.stat:nth-child(3){background:var(--pink)}.stat:nth-child(4){background:var(--peach)}
+.stat b{display:block;font-size:19px;font-weight:800;color:var(--navy)}
+.stat span{font-size:11.5px;color:var(--muted)}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px}
+.sur{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:10px;cursor:pointer;text-align:left;position:relative}
+.sur:hover{border-color:var(--blue)}
+.sur .no{font-size:11px;color:var(--muted);font-weight:700}
+.sur .nm{font-weight:700;font-size:14px}
+.sur .ar{font-size:20px;position:absolute;right:10px;top:6px;color:var(--navy)}
+.sur .mini{height:6px;background:#eef2f8;border-radius:99px;overflow:hidden;margin:8px 0 4px}
+.sur .mini i{display:block;height:100%;background:var(--blue)}
+.sur.hafal{border-color:#bfe8d4;background:#f2fbf6}
+.sur.hafal .mini i{background:var(--green)}
+.sur.mutqin{border-color:#f6d6b4;background:#fff6ec}
+.sur.mutqin .mini i{background:var(--gold)}
+.sur.now{box-shadow:0 0 0 3px #ddd3fd}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:4px 0 10px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.weekrow{display:grid;grid-template-columns:78px 160px 1fr;gap:8px;align-items:start;padding:10px 0;border-top:1px solid var(--line)}
+.weekrow:first-of-type{border-top:0}
+.weekrow .dn{font-weight:800;padding-top:8px}
+.weekrow .fields{display:grid;gap:6px}
+@media(max-width:600px){.weekrow{grid-template-columns:1fr 1fr}.weekrow .dn{grid-column:1/-1;padding-top:0}.weekrow .fields{grid-column:1/-1}}
+.plan-item{display:grid;grid-template-columns:150px 1fr auto;gap:10px;padding:9px 0;border-top:1px solid var(--line);align-items:center;font-size:14px}
+.plan-item:first-child{border-top:0}
+.plan-item.today{background:var(--lav);border-radius:10px;padding:9px 8px}
+.plan-item .d{color:var(--muted);font-size:13px}
+.plan-wk{font-size:12px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.04em;margin:14px 0 2px}
+@media(max-width:600px){.plan-item{grid-template-columns:1fr auto}.plan-item .d{grid-column:1/-1}}
+.log{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line);align-items:flex-start}
+.log:first-child{border-top:0}
+.log .body{flex:1}
+.x{border:0;background:#f5f2fa;color:#8a93a5;width:30px;height:30px;border-radius:9px;cursor:pointer;font-size:15px;flex:0 0 auto}
+.x:hover{background:var(--red-soft);color:var(--red)}
+.guide p,.guide li{font-size:14px}
+.guide li{margin:4px 0}
+.field{display:grid;gap:4px;margin:10px 0}
+.field label{font-weight:700;font-size:13px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg label{border:1.5px solid var(--line);border-radius:10px;padding:7px 11px;cursor:pointer;font-size:13.5px}
+.seg input{display:none}
+.seg input:checked+span{color:var(--navy);font-weight:800}
+.seg label:has(input:checked){border-color:var(--navy);background:var(--sky)}
+.modal-bg{position:fixed;inset:0;background:rgba(15,25,45,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal{background:#fff;border-radius:18px;max-width:420px;width:100%;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.25);max-height:90vh;overflow:auto}
+.modal h3{margin:0 0 8px;font-size:17px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#4b3f86;color:#fff;padding:10px 14px;border-radius:12px;font-size:13.5px;display:flex;gap:12px;align-items:center;z-index:60;box-shadow:0 8px 30px rgba(0,0,0,.25);max-width:92vw}
+.toast button{background:none;border:0;color:#ffd6e6;font-weight:800;cursor:pointer}
+.empty{text-align:center;color:var(--muted);padding:24px 8px}
+.congrats{text-align:center;padding:24px 12px}
+.congrats .ar{font-size:30px;color:var(--gold)}
+.hint{font-size:12.5px;color:var(--muted);margin-top:4px}
+.seg2{display:flex;gap:6px;background:#f4f0fb;padding:4px;border-radius:14px;margin:10px 0}
+.seg2 button{flex:1;border:0;background:transparent;border-radius:11px;padding:9px 6px;font-weight:700;color:var(--muted);cursor:pointer;font-size:13.5px}
+.seg2 button.on{background:#fff;color:#4b3fa0;box-shadow:0 2px 6px rgba(106,92,199,.15)}
+.dzc{position:relative;transition:background .3s}
+.dzc.done{background:linear-gradient(135deg,#f0fbf5,#eaf7f0);border-color:#c9ecd9}
+.dzc .dzt{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.dzc .dzt b{font-size:14.5px}
+.dzc .q{font-size:25px;line-height:2;margin:8px 0 4px}
+.dzc .lt{font-size:13.5px;font-style:italic;color:#6a6488;margin:4px 0}
+.dzc .idt{font-size:13.5px;color:var(--muted);margin:4px 0}
+.dzc details{font-size:12.5px;color:var(--muted);margin-top:6px}
+.dzc summary{cursor:pointer;color:var(--blue);font-weight:600}
+.cnt{display:flex;align-items:center;gap:10px;margin-top:10px}
+.tap{flex:1;border:0;border-radius:14px;padding:12px;font-weight:800;font-size:15px;cursor:pointer;background:var(--lav);color:#4b3fa0;transition:transform .08s}
+.tap:active{transform:scale(.97)}
+.dzc.done .tap{background:#bfeed6;color:#1f6b49}
+.minus{width:40px;height:40px;border-radius:12px;border:1.5px solid var(--line);background:#fff;cursor:pointer;color:var(--muted);font-size:18px}
+.dzbar{height:6px;background:#efeaf7;border-radius:99px;overflow:hidden;margin-top:8px}
+.dzbar i{display:block;height:100%;background:linear-gradient(90deg,#b9adf5,#9fdcbf);transition:width .2s}
+.shchips{display:flex;gap:6px;flex-wrap:wrap}
+.shchip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.shchip.on{background:var(--mint);border-color:#bfe8d4;color:#1f6b49}
+.dzrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.dzpill{flex:1;min-width:120px;border:1.5px solid var(--line);border-radius:14px;padding:10px;background:#fff;cursor:pointer;text-align:left}
+.dzpill.ok{background:var(--mint);border-color:#bfe8d4}
+.dzpill b{display:block;font-size:14px}.dzpill span{font-size:12px;color:var(--muted)}
+.q{font-family:'Amiri Quran','Amiri',serif;direction:rtl;font-size:27px;line-height:2.1;color:#2f2a4a}
+.bsm{text-align:center;font-size:26px;margin:4px 0 10px;color:var(--navy)}
+.ay{padding:12px 4px;border-top:1px dashed var(--line);position:relative}
+.ay:first-of-type{border-top:0}
+.ay.hl{background:linear-gradient(90deg,#fff4ea,#fdeaf3);border-radius:14px;padding:12px 10px;border-top-color:transparent}
+.ay .tr{font-size:13.5px;color:var(--muted);margin-top:2px}
+.ay .num{font-family:'Amiri',serif;color:var(--gold);font-size:22px;margin-right:4px}
+.ay .an{position:absolute;left:4px;top:10px;font-size:11px;font-weight:800;color:#b3abd0}
+.ay.hide .q{filter:blur(9px);cursor:pointer;user-select:none}
+.ay.hide .tr{visibility:hidden}
+.readbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.readbar select{width:auto}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-size:13px;border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;background:#fff}
+.toggle.on{background:var(--mint);border-color:#bfe8d4;color:#1f6b49;font-weight:700}
+.chip.link{cursor:pointer}.chip.link:hover{border-color:var(--blue)}
+#player{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:min(860px,calc(100% - 20px));background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border:1px solid #e5ddf7;border-radius:18px;box-shadow:0 10px 30px rgba(90,70,140,.18);padding:10px 12px;z-index:40;display:none}
+#player.show{display:block}
+#player .pl-top{display:flex;align-items:center;gap:10px}
+#player .pbtn{width:44px;height:44px;border-radius:50%;border:0;background:#cfc4fa;color:#3d3190;font-size:18px;cursor:pointer;flex:0 0 auto}
+#player .ttl{flex:1;min-width:0}
+#player .ttl b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#player input[type=range]{width:100%;accent-color:#8b7fe0;margin:6px 0 0}
+#player .pl-opts{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+#player .pl-opts select{width:auto;padding:4px 6px;font-size:12.5px}
+#player .xbtn{border:0;background:#f5f2fa;border-radius:9px;width:30px;height:30px;cursor:pointer;color:#8a83a5}
+body.has-player .wrap{padding-bottom:150px}
+#player .pl-top{flex-wrap:wrap}
+@media(max-width:600px){#player .pl-opts{order:4;flex-basis:100%;justify-content:flex-start}#player .ttl{flex:1 1 120px}}
+.ibscore{display:flex;align-items:center;gap:14px}
+.ring{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}
+.ring b{width:58px;height:58px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:17px;color:#4b3fa0}
+.datenav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0 4px}
+.datenav button{border:1.5px solid var(--line);background:#fff;border-radius:10px;width:38px;height:38px;cursor:pointer;font-size:16px}
+.datenav button:disabled{opacity:.35}
+.fardhu{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
+.fb{border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:10px 2px;cursor:pointer;text-align:center;font-weight:700;font-size:12.5px}
+.fb i{display:block;font-style:normal;font-size:19px;height:24px}
+.fb.s1{background:var(--mint);border-color:#bfe8d4;color:#1f6b49}
+.fb.s2{background:#fff1d9;border-color:#f6d6a8;color:#9a6a1c}
+.ibrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.ibrow:first-of-type{border-top:0}
+.ibrow .nm{font-weight:600;font-size:14px}
+.ibrow .sub{font-size:12px;color:var(--muted)}
+.tg{min-width:44px;height:36px;border-radius:11px;border:1.5px solid var(--line);background:#fff;cursor:pointer;font-size:16px;font-weight:800;color:#c9c2dc}
+.tg.on{background:var(--mint);border-color:#bfe8d4;color:#1f6b49}
+.tg.auto{min-width:auto;padding:0 10px;font-size:12.5px}
+.ibnum{width:86px!important;text-align:center}
+.wk{width:100%;border-collapse:separate;border-spacing:3px;font-size:12px}
+.wk th{font-weight:700;color:var(--muted);font-size:11px}
+.wk td{text-align:center;border-radius:7px;padding:5px 0;background:#f6f3fb}
+.wk td.y{background:var(--mint);color:#1f6b49;font-weight:800}
+.wk td.na{background:transparent;color:#cfc9de}
+.wk td.lbl{text-align:left;background:transparent;font-weight:600;color:var(--ink);padding-right:4px;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal .h{font-size:11px;color:var(--muted);text-align:center;font-weight:700}
+.cal button{aspect-ratio:1;border:0;border-radius:10px;cursor:pointer;font-size:12px;font-weight:700;color:#4b4566;position:relative}
+.cal button.td{outline:2px solid #8b7fe0}
+.cal button small{position:absolute;bottom:2px;left:0;right:0;font-size:9px}
+.ibbar{display:grid;grid-template-columns:1fr 46px;gap:8px;align-items:center;font-size:13px;margin:6px 0}
+.ibbar .bb{height:8px;background:#efeaf7;border-radius:99px;overflow:hidden;margin-top:3px}
+.ibbar .bb i{display:block;height:100%;background:linear-gradient(90deg,#b9adf5,#9fdcbf)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="toprow">
+      <div>
+        <h1>Program Hafalan Juz 30</h1>
+        <div class="sub">Jadwal personal Devy · menyesuaikan mengajar, kuliah, tahsin & olahraga</div>
+      </div>
+      <div class="tools">
+        <span class="pill status" id="status">Memuat…</span>
+        <button class="btn-undo" id="undoBtn" title="Batalkan perubahan terakhir">↶ Undo</button>
+      </div>
+    </div>
+    <div class="progress-hero">
+      <div class="bar"><i id="heroBar" style="width:0"></i></div>
+      <div class="hero-nums"><span id="heroL"></span><span id="heroR"></span></div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs"></nav>
+  <main id="view"></main>
+</div>
+<div id="player"><div class="pl-top"><button class="pbtn" id="plPlay">▶</button><div class="ttl"><b id="plTitle">—</b><span class="small muted" id="plTime">0:00 / 0:00</span></div>
+<div class="pl-opts"><label>Ulang <select id="plRep"><option value="1">1×</option><option value="3">3×</option><option value="5">5×</option><option value="10">10×</option><option value="0">terus</option></select></label>
+<label>Kecepatan <select id="plSpd"><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option></select></label></div>
+<button class="xbtn" id="plClose" title="Tutup pemutar">✕</button></div><input type="range" id="plSeek" min="0" max="1000" value="0"></div>
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script>
+/* ===== Data Juz 30 ===== */
+const SURAH=[
+[78,"An-Naba'","النبأ",40],[79,"An-Nazi'at","النازعات",46],[80,"'Abasa","عبس",42],[81,"At-Takwir","التكوير",29],
+[82,"Al-Infithar","الانفطار",19],[83,"Al-Muthaffifin","المطففين",36],[84,"Al-Insyiqaq","الانشقاق",25],[85,"Al-Buruj","البروج",22],
+[86,"Ath-Thariq","الطارق",17],[87,"Al-A'la","الأعلى",19],[88,"Al-Ghasyiyah","الغاشية",26],[89,"Al-Fajr","الفجر",30],
+[90,"Al-Balad","البلد",20],[91,"Asy-Syams","الشمس",15],[92,"Al-Lail","الليل",21],[93,"Adh-Dhuha","الضحى",11],
+[94,"Asy-Syarh","الشرح",8],[95,"At-Tin","التين",8],[96,"Al-'Alaq","العلق",19],[97,"Al-Qadr","القدر",5],
+[98,"Al-Bayyinah","البينة",8],[99,"Az-Zalzalah","الزلزلة",8],[100,"Al-'Adiyat","العاديات",11],[101,"Al-Qari'ah","القارعة",11],
+[102,"At-Takatsur","التكاثر",8],[103,"Al-'Ashr","العصر",3],[104,"Al-Humazah","الهمزة",9],[105,"Al-Fil","الفيل",5],
+[106,"Quraisy","قريش",4],[107,"Al-Ma'un","الماعون",7],[108,"Al-Kautsar","الكوثر",3],[109,"Al-Kafirun","الكافرون",6],
+[110,"An-Nashr","النصر",3],[111,"Al-Lahab","المسد",5],[112,"Al-Ikhlash","الإخلاص",4],[113,"Al-Falaq","الفلق",5],[114,"An-Nas","الناس",6]];
+const BY={};SURAH.forEach(s=>BY[s[0]]={no:s[0],name:s[1],ar:s[2],n:s[3]});
+const TOTAL=SURAH.reduce((a,s)=>a+s[3],0); // 564
+const HARI=['Ahad','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const BULAN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const TYPES={
+  full:{label:'Hafalan baru (penuh)',short:'Hafalan baru',cls:'t-full'},
+  ringan:{label:'Hafalan baru (ringan)',short:'Hafalan ringan',cls:'t-ringan'},
+  murajaah:{label:'Murajaah saja',short:'Murajaah',cls:'t-murajaah'},
+  libur:{label:'Istirahat',short:'Istirahat',cls:'t-libur'}
+};
+const QUAL={lancar:'Lancar',salah:'Ada yang salah',ulang:'Perlu diulang'};
+
+/* ===== Tanggal ===== */
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const todayStr=()=>ymd(new Date());
+const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return ymd(d)};
+const fmt=(s,day=true)=>{const d=parse(s);return (day?HARI[d.getDay()]+', ':'')+d.getDate()+' '+BULAN[d.getMonth()]+' '+d.getFullYear()};
+const fmtShort=s=>{const d=parse(s);return HARI[d.getDay()]+', '+d.getDate()+' '+BULAN[d.getMonth()].slice(0,3)};
+const dayNum=s=>Math.round(parse(s).getTime()/864e5);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ===== State ===== */
+function defaultState(){return{
+  v:1,
+  settings:{target:4,order:'nas',startDate:todayStr()},
+  week:{
+    1:{type:'full',time:"Ba'da Subuh, ±20 menit",note:'Hari paling longgar — porsi hafalan baru penuh'},
+    2:{type:'ringan',time:"Ba'da Subuh, ±10–15 menit",note:'Hari mengajar — setengah porsi, ulang di shalat Dhuha/Zhuhur'},
+    3:{type:'ringan',time:"Ba'da Subuh, ±10–15 menit",note:'Hari mengajar — setengah porsi'},
+    4:{type:'ringan',time:"Ba'da Subuh, ±10–15 menit",note:'Hari mengajar — setengah porsi'},
+    5:{type:'murajaah',time:"Ba'da Subuh, ±10 menit",note:'Hari kuliah — cukup murajaah; dengarkan murattal di perjalanan ke kampus'},
+    6:{type:'libur',time:'—',note:'Kuliah sampai sore — istirahat; cukup baca hafalan dalam shalat'},
+    0:{type:'murajaah',time:'Setelah tahsin, ±06.30',note:'Murajaah pekanan + minta ustadzah tahsin menyimak bacaan'}
+  },
+  progress:{},log:[],dz:{date:'',pagi:{},petang:{},salah:{}},dzLog:{},updatedAt:0
+}}
+function normalize(s){
+  const d=defaultState();
+  s=s&&typeof s==='object'?s:{};
+  s.settings=Object.assign({},d.settings,s.settings||{});
+  s.week=s.week||{};for(let i=0;i<7;i++){s.week[i]=Object.assign({},d.week[i],s.week[i]||{})}
+  s.progress=s.progress||{};s.ib=Object.assign({days:{},off:[],custom:[]},s.ib||{});s.dz=Object.assign({date:'',pagi:{},petang:{},salah:{}},s.dz||{});s.dzLog=s.dzLog||{};s.log=Array.isArray(s.log)?s.log:[];s.updatedAt=s.updatedAt||0;s.v=1;
+  return s;
+}
+const LS='hafalan-juz30-devy-v1';
+let localOK=true,state;
+try{state=normalize(JSON.parse(localStorage.getItem(LS)||'null'))}catch(e){localOK=false;state=normalize(null)}
+
+const P=no=>state.progress[no]||{done:0,mutqin:false,flag:false};
+const setP=(no,obj)=>{state.progress[no]=Object.assign({done:0,mutqin:false,flag:false},state.progress[no]||{},obj)};
+const orderList=()=>{const a=SURAH.map(s=>s[0]);return state.settings.order==='nas'?a.reverse():a};
+const current=()=>orderList().find(no=>P(no).done<BY[no].n);
+const totalDone=()=>SURAH.reduce((a,s)=>a+Math.min(P(s[0]).done,s[3]),0);
+const finishedList=()=>orderList().filter(no=>P(no).done>=BY[no].n);
+const weekOf=s=>state.week[parse(s).getDay()];
+function amountFor(s){
+  const t=+state.settings.target||1, w=weekOf(s);
+  if(s<state.settings.startDate)return 0;
+  return w.type==='full'?t:w.type==='ringan'?Math.max(1,Math.ceil(t/2)):0;
+}
+const logsOn=(d,type)=>state.log.filter(e=>e.date===d&&(!type||e.type===type));
+
+/* ===== Simulasi rencana ===== */
+function simulate(limit=2500){
+  const ol=orderList(),prog={};ol.forEach(no=>prog[no]=P(no).done);
+  const t=+state.settings.target||1;
+  const weekly=[0,1,2,3,4,5,6].reduce((a,i)=>{const w=state.week[i];return a+(w.type==='full'?t:w.type==='ringan'?Math.max(1,Math.ceil(t/2)):0)},0);
+  if(weekly===0)return{sessions:[],end:null,weekly:0};
+  let d=todayStr(); if(d<state.settings.startDate)d=state.settings.startDate;
+  if(d===todayStr()&&logsOn(d,'ziyadah').length)d=addDays(d,1);
+  const out=[];
+  for(let i=0;i<limit;i++){
+    const cur=ol.find(no=>prog[no]<BY[no].n); if(!cur)break;
+    const a=amountFor(d);
+    if(a>0){const from=prog[cur]+1,to=Math.min(BY[cur].n,prog[cur]+a);prog[cur]=to;out.push({date:d,surah:cur,from,to})}
+    d=addDays(d,1);
+  }
+  return{sessions:out,end:out.length?out[out.length-1].date:null,weekly};
+}
+
+/* ===== Rencana murajaah ===== */
+function murajaahPlan(s){
+  const fin=finishedList(), cur=current();
+  const flagged=orderList().filter(no=>P(no).flag&&P(no).done>0).map(no=>({no,from:1,to:P(no).done}));
+  const fset=new Set(flagged.map(x=>x.no));
+  const dekat=[];
+  if(cur&&P(cur).done>0&&!fset.has(cur))dekat.push({no:cur,from:1,to:P(cur).done});
+  fin.slice(-2).reverse().forEach(no=>{if(!fset.has(no))dekat.push({no,from:1,to:BY[no].n})});
+  const dset=new Set(dekat.map(x=>x.no));
+  const rest=fin.filter(no=>!dset.has(no)&&!fset.has(no));
+  const size=weekOf(s).type==='murajaah'?45:20;
+  const chunks=[];let c=[],sum=0;
+  rest.forEach(no=>{c.push({no,from:1,to:BY[no].n});sum+=BY[no].n;if(sum>=size){chunks.push(c);c=[];sum=0}});
+  if(c.length)chunks.push(c);
+  const jauh=chunks.length?chunks[((dayNum(s)%chunks.length)+chunks.length)%chunks.length]:[];
+  return{flagged,dekat,jauh,chunks:chunks.length};
+}
+const lbl=x=>'QS. '+BY[x.no].name+(x.from===1&&x.to===BY[x.no].n?'':' '+x.from+'–'+x.to);
+
+function streak(){
+  let d=todayStr(),n=0;
+  if(!state.log.some(e=>e.date===d))d=addDays(d,-1);
+  for(let i=0;i<800;i++){
+    if(state.log.some(e=>e.date===d)){n++}
+    else if(weekOf(d).type!=='libur'||d<state.settings.startDate){break}
+    d=addDays(d,-1);
+  }
+  return n;
+}
+
+/* ===== Simpan (otomatis), Sinkron GitHub Gist & Undo ===== */
+let saveTimer=null,pushing=false,again=false;
+const hist=[];
+const GKEY=LS+'-gh',GFILE='hafalan-juz30-devy.json';
+let gh={token:'',id:'',last:0};try{gh=Object.assign(gh,JSON.parse(localStorage.getItem(GKEY)||'{}'))}catch(e){}
+const saveGh=()=>{try{localStorage.setItem(GKEY,JSON.stringify(gh))}catch(e){}};
+function snap(){hist.push(JSON.stringify(state));if(hist.length>50)hist.shift();updUndo()}
+function updUndo(){document.getElementById('undoBtn').disabled=!hist.length}
+function setStatus(k){
+  const m={saving:'● Menyimpan…',synced:'✓ Tersinkron',local:'✓ Tersimpan di perangkat ini',offline:'⚠ Offline — tersimpan di perangkat',err:'⚠ Sinkron gagal — tersimpan di perangkat',mem:'⚠ Penyimpanan tidak tersedia'};
+  document.getElementById('status').textContent=m[k]||k;
+}
+function persist(){
+  state.updatedAt=Date.now();
+  try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}
+  if(gh.token&&gh.id){setStatus('saving');clearTimeout(saveTimer);saveTimer=setTimeout(push,2500)}
+  else setStatus(localOK?'local':'mem');
+}
+function undo(){
+  if(!hist.length)return;
+  state=normalize(JSON.parse(hist.pop()));updUndo();persist();render();toast('Perubahan terakhir dibatalkan');
+}
+async function api(path,opt){
+  const r=await fetch('https://api.github.com'+path,Object.assign({headers:{'Authorization':'Bearer '+gh.token,'Accept':'application/vnd.github+json','Content-Type':'application/json'}},opt||{}));
+  if(!r.ok){const e=new Error('http '+r.status);e.status=r.status;throw e}
+  return r.json();
+}
+async function readGist(){
+  const g=await api('/gists/'+gh.id);const f=g.files&&g.files[GFILE];if(!f)return null;
+  let txt=f.content;if(f.truncated){txt=await (await fetch(f.raw_url)).text()}
+  try{return JSON.parse(txt)}catch(e){return null}
+}
+async function push(){
+  if(!gh.token||!gh.id)return;
+  if(!navigator.onLine){setStatus('offline');return}
+  if(pushing){again=true;return}
+  pushing=true;
+  try{await api('/gists/'+gh.id,{method:'PATCH',body:JSON.stringify({files:{[GFILE]:{content:JSON.stringify(state)}}})});gh.last=Date.now();saveGh();setStatus('synced')}
+  catch(e){setStatus(e.status===401?'err':navigator.onLine?'err':'offline');if(e.status===401)toast('Token GitHub tidak berlaku lagi. Sambungkan ulang di tab Jadwal & Atur.')}
+  pushing=false;if(again){again=false;push()}
+}
+async function pull(){
+  if(!gh.token||!gh.id||!navigator.onLine){setStatus(gh.token?'offline':(localOK?'local':'mem'));return}
+  try{
+    const remote=await readGist();
+    if(remote&&(remote.updatedAt||0)>(state.updatedAt||0)){state=normalize(remote);try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){};render();toast('Data terbaru dari perangkat lain sudah dimuat')}
+    else if(!remote||(state.updatedAt||0)>(remote.updatedAt||0)){await push();return}
+    setStatus('synced');
+  }catch(e){setStatus(e.status===404?'err':'offline');if(e.status===404){gh.id='';saveGh()}}
+}
+async function connectGh(token){
+  gh.token=token.trim();gh.id='';
+  setStatus('saving');
+  try{
+    await api('/user');
+    let page=1,found=null;
+    while(page<=5&&!found){const list=await api('/gists?per_page=100&page='+page);found=list.find(g=>g.files&&g.files[GFILE]);if(list.length<100)break;page++}
+    if(found){gh.id=found.id;saveGh();await pull();toast('Tersambung ✓ Data disinkronkan')}
+    else{const g=await api('/gists',{method:'POST',body:JSON.stringify({description:'Data aplikasi Program Hafalan Juz 30 (jangan dihapus)',public:false,files:{[GFILE]:{content:JSON.stringify(state)}}})});gh.id=g.id;saveGh();setStatus('synced');toast('Tersambung ✓ Penyimpanan sinkron dibuat')}
+    render();return true;
+  }catch(e){gh.token='';gh.id='';saveGh();setStatus(localOK?'local':'mem');toast(e.status===401?'Token tidak valid. Cek lagi ya.':e.status===403||e.status===404?'Token belum punya izin “gist”.':'Gagal tersambung. Cek internet lalu coba lagi.');return false}
+}
+function disconnectGh(){gh={token:'',id:'',last:0};saveGh();setStatus(localOK?'local':'mem');render();toast('Sinkron diputus. Data tetap ada di perangkat ini.')}
+function initSync(){
+  if(gh.token&&gh.id)pull();else setStatus(localOK?'local':'mem');
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pull();else if(gh.token&&gh.id&&saveTimer){clearTimeout(saveTimer);push()}});
+  window.addEventListener('online',()=>pull());
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(state,null,1)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='cadangan-hafalan-'+todayStr()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+  toast('Cadangan diunduh');
+}
+function importData(file){
+  const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!d.settings||!d.progress)throw 0;snap();state=normalize(d);persist();render();toast('Data dipulihkan dari cadangan',true)}catch(e){toast('File cadangan tidak dikenali')}};r.readAsText(file);
+}
+function vSync(){
+  const on=gh.token&&gh.id;
+  return '<div class="card"><h2>🔄 Sinkron antar perangkat & cadangan</h2>'+
+   (on?'<div class="done-box">✓ Tersambung ke GitHub. Data otomatis tersinkron antara HP, tablet, dan laptop.'+(gh.last?'<div class="small" style="font-weight:500">Terakhir disinkron: '+new Date(gh.last).toLocaleString('id-ID')+'</div>':'')+'</div><div class="row"><button class="btn btn-soft" data-act="ghpull">↻ Sinkron sekarang</button><button class="btn btn-ghost" data-act="ghoff">Putuskan</button></div>'
+   :'<p class="small muted" style="margin-top:0">Supaya data sama di semua perangkat, tempel <b>token GitHub</b> (izin <i>gist</i>) sekali di tiap perangkat. Data disimpan sebagai gist <b>privat</b> di akunmu.</p><div class="field"><input type="password" id="ghTok" placeholder="Tempel token GitHub di sini (ghp_…)" autocomplete="off"></div><div class="row"><button class="btn btn-primary" data-act="ghon">Sambungkan</button><a class="small" href="https://github.com/settings/tokens/new?scopes=gist&description=Hafalan%20Juz%2030" target="_blank" rel="noopener">Buat token di GitHub ↗</a></div>')+
+   '<h3>Cadangan manual</h3><div class="row"><button class="btn btn-soft" data-act="exp">⬇ Unduh cadangan</button><label class="btn btn-soft" style="cursor:pointer">⬆ Pulihkan dari file<input type="file" id="impFile" accept=".json,application/json" style="display:none"></label></div><div class="row" style="margin-top:8px"><button class="btn btn-ghost" data-act="paste">📋 Tempel data dari aplikasi versi Claude</button></div><div class="hint">Pulihkan bisa dibatalkan dengan Undo.</div></div>';
+}
+
+/* ===== Aksi ===== */
+function doZiyadah(amount,note){
+  const cur=current(); if(!cur){toast('MasyaAllah, semua surah sudah hafal!');return}
+  snap();
+  const p=P(cur),from=p.done+1,to=Math.min(BY[cur].n,p.done+Math.max(1,amount));
+  setP(cur,{done:to});
+  state.log.push({id:'z'+Date.now(),date:todayStr(),ts:Date.now(),type:'ziyadah',surah:cur,from,to,note:note||''});
+  persist();render();
+  toast(to>=BY[cur].n?'Alhamdulillah, QS. '+BY[cur].name+' selesai dihafal! 🎉':'Tercatat: QS. '+BY[cur].name+' ayat '+from+'–'+to,true);
+}
+function doMurajaah(q,note){
+  const m=murajaahPlan(todayStr());const items=[...m.flagged,...m.dekat,...m.jauh];
+  snap();
+  const nos=[...new Set(items.map(x=>x.no))];
+  if(q==='lancar')nos.forEach(no=>{if(P(no).flag)setP(no,{flag:false})});
+  if(q==='ulang')nos.forEach(no=>setP(no,{flag:true}));
+  state.log.push({id:'m'+Date.now(),date:todayStr(),ts:Date.now(),type:'murajaah',items:items.map(lbl),quality:q,note:note||''});
+  persist();render();toast('Murajaah dicatat: '+QUAL[q],true);
+}
+function delLog(id){
+  const e=state.log.find(x=>x.id===id); if(!e)return;
+  confirmBox('Hapus catatan ini?',e.type==='ziyadah'?'Progres hafalan QS. '+BY[e.surah].name+' akan dikembalikan ke sebelum sesi ini.':'Catatan murajaah akan dihapus.',()=>{
+    snap();
+    if(e.type==='ziyadah'&&P(e.surah).done===e.to)setP(e.surah,{done:e.from-1,mutqin:false});
+    state.log=state.log.filter(x=>x.id!==id);persist();render();toast('Catatan dihapus',true);
+  });
+}
+
+/* ===== UI helpers ===== */
+let toastT;
+function toast(msg,withUndo){
+  const r=document.getElementById('toastRoot');
+  r.innerHTML='<div class="toast"><span>'+esc(msg)+'</span>'+(withUndo?'<button data-act="undo">Undo</button>':'')+'</div>';
+  clearTimeout(toastT);toastT=setTimeout(()=>r.innerHTML='',4200);
+}
+function openModal(html){document.getElementById('modalRoot').innerHTML='<div class="modal-bg" data-act="closebg"><div class="modal">'+html+'</div></div>'}
+function closeModal(){document.getElementById('modalRoot').innerHTML=''}
+let confirmCb=null;
+function confirmBox(title,text,cb){
+  confirmCb=cb;
+  openModal('<h3>'+esc(title)+'</h3><p class="muted">'+esc(text)+'</p><div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn btn-soft" data-act="close">Batal</button><button class="btn btn-red" data-act="confirmok">Ya, lanjutkan</button></div>');
+}
+
+/* ===== Render ===== */
+const TABS=[['today','Hari Ini'],['ibadah','Ibadah Harian'],['baca','Baca & Dengar'],['dzikir','Dzikir'],['jadwal','Jadwal & Atur'],['rencana','Rencana'],['progres','Progres Surah'],['riwayat','Riwayat'],['panduan','Panduan']];
+let tab='today';try{tab=localStorage.getItem(LS+'-tab')||'today'}catch(e){}
+function render(){
+  document.getElementById('tabs').innerHTML=TABS.map(([k,l])=>'<button class="tab'+(tab===k?' on':'')+'" data-tab="'+k+'">'+l+'</button>').join('');
+  const td=totalDone(),pct=Math.round(td/TOTAL*1000)/10;
+  document.getElementById('heroBar').style.width=pct+'%';
+  document.getElementById('heroL').textContent=td+' / '+TOTAL+' ayat ('+pct+'%)';
+  document.getElementById('heroR').textContent=finishedList().length+' / 37 surah';
+  const v=document.getElementById('view');
+  v.innerHTML=({ibadah:vIbadah,dzikir:vDzikir,baca:vBaca,today:vToday,jadwal:vJadwal,rencana:vRencana,progres:vProgres,riwayat:vRiwayat,panduan:vPanduan}[tab]||vToday)();
+  updUndo();
+}
+
+function vToday(){
+  const d=todayStr(),w=weekOf(d),ty=TYPES[w.type],cur=current(),amt=amountFor(d);
+  const sim=simulate(),st=streak();
+  let h='<div class="card"><div class="daybar"><div><div class="muted small">Hari ini</div><h2>'+fmt(d)+'</h2></div><span class="badge '+ty.cls+'">'+ty.short+'</span></div>'+
+    '<div class="small" style="margin-top:6px">🕐 <b>'+esc(w.time)+'</b>'+(w.note?' · <span class="muted">'+esc(w.note)+'</span>':'')+'</div></div>';
+  h+='<div class="stats" style="margin-bottom:12px">'+
+    '<div class="stat"><b>'+Math.round(totalDone()/TOTAL*100)+'%</b><span>Juz 30 terhafal</span></div>'+
+    '<div class="stat"><b>'+finishedList().length+'</b><span>surah selesai</span></div>'+
+    '<div class="stat"><b>'+st+' hari</b><span>istiqamah berturut</span></div>'+
+    '<div class="stat"><b style="font-size:15px">'+(cur?(sim.end?fmtShort(sim.end).split(', ')[1]+' '+parse(sim.end).getFullYear():'—'):'Selesai')+'</b><span>perkiraan khatam Juz 30</span></div></div>';
+
+  if(!cur){
+    h+='<div class="card congrats"><div class="ar">بَارَكَ اللّٰهُ فِيْكِ</div><h2>MasyaAllah, Juz 30 sudah terhafal semua!</h2><p class="muted">Sekarang fokus menjaga dengan murajaah rutin dan tandai surah yang sudah mutqin di tab Progres.</p></div>';
+  }
+  /* Ziyadah */
+  if(cur){
+    const zToday=logsOn(d,'ziyadah');
+    h+='<div class="card"><h2>📖 Hafalan baru (ziyadah)</h2>';
+    if(d<state.settings.startDate){
+      h+='<div class="info-box">Program dimulai <b>'+fmt(state.settings.startDate)+'</b>. Sambil menunggu, dengarkan murattal QS. '+BY[cur].name+' beberapa kali agar telinga akrab.</div>';
+    }else if(zToday.length){
+      h+='<div class="done-box">✓ Alhamdulillah, hari ini sudah: '+zToday.map(e=>'QS. '+BY[e.surah].name+' '+e.from+'–'+e.to).join(', ')+'</div>'+
+        '<div class="row"><button class="btn btn-ghost" data-act="bonus">+ Tambah hafalan lagi (bonus)</button></div>';
+    }else if(amt>0){
+      const p=P(cur),from=p.done+1,to=Math.min(BY[cur].n,p.done+amt);
+      h+='<div class="target"><div><div class="muted small">Target hari ini · '+(to-from+1)+' ayat</div><div class="nm">QS. '+BY[cur].name+'</div><div>Ayat <b>'+from+'–'+to+'</b> <span class="muted small">dari '+BY[cur].n+'</span></div></div><div class="ar">'+BY[cur].ar+'</div></div>'+
+        '<ol class="steps"><li>Dengarkan murattal 3× sambil melihat teks (tombol di bawah).</li><li>Baca sendiri dengan melihat 10× — perhatikan tajwid (pakai ilmu dari tahsin).</li><li>Tutup mushaf, hafalkan per ayat, lalu sambungkan.</li><li>Ulang sambungan 3–5× tanpa melihat, termasuk ayat sebelumnya.</li><li>Pakai hafalan ini di shalat hari ini.</li></ol>'+
+        '<div class="row" style="margin-top:10px"><button class="btn btn-primary" data-act="openread" data-no="'+cur+'" data-from="'+from+'" data-to="'+to+'">📖 Baca teks & 🎧 dengarkan murattal</button></div>'+
+        '<div class="field" style="margin-top:12px"><input type="text" id="zNote" placeholder="Catatan (opsional): mis. ayat 3 masih tertukar"></div>'+
+        '<div class="row"><button class="btn btn-green" data-act="ziyadah" data-amt="'+amt+'">✓ Sudah hafal</button><button class="btn btn-ghost" data-act="bonus">Atur jumlah ayat lain</button></div>';
+    }else{
+      h+='<p class="muted" style="margin:6px 0">Hari ini <b>tidak ada hafalan baru</b> — fokus menjaga yang sudah ada. Kalau ternyata longgar, boleh tambah.</p>'+
+        '<div class="small muted">Berikutnya: QS. '+BY[cur].name+' ayat '+(P(cur).done+1)+' dst.</div>'+
+        '<div class="row" style="margin-top:8px"><button class="btn btn-soft" data-act="bonus">+ Tetap tambah hafalan baru</button></div>';
+    }
+    h+='</div>';
+  }
+  /* Ibadah harian */
+  {const D=ibDay(d),sh=FARDHU.filter(f=>(D.s||{})[f]).length,sc=ibScore(d);
+  h+='<div class="card"><div class="daybar"><div><h2>🕌 Ibadah hari ini</h2><div class="small muted">'+(D.haid?'🌸 Sedang berhalangan':'Shalat fardhu '+sh+'/5')+' · capaian '+pct(sc)+'</div></div><button class="btn btn-soft" data-act="opentab" data-t="ibadah">Isi rekap ›</button></div><div class="dzbar"><i style="width:'+(sc*100)+'%"></i></div></div>';}
+  /* Dzikir */
+  {const L=dzLogToday(),sh=(L.shalat||[]).length;
+  h+='<div class="card"><h2>📿 Dzikir hari ini</h2><div class="dzrow">'+
+    '<button class="dzpill'+(L.pagi?' ok':'')+'" data-act="opendz" data-s="pagi"><b>'+(L.pagi?'✓ ':'🌅 ')+'Dzikir pagi</b><span>Subuh – terbit matahari</span></button>'+
+    '<button class="dzpill'+(L.petang?' ok':'')+'" data-act="opendz" data-s="petang"><b>'+(L.petang?'✓ ':'🌇 ')+'Dzikir petang</b><span>Ashar – Maghrib</span></button>'+
+    '<button class="dzpill'+(sh>=5?' ok':'')+'" data-act="opendz" data-s="salah"><b>🤲 Setelah shalat</b><span>'+sh+'/5 shalat hari ini</span></button></div></div>';}
+  /* Murajaah */
+  const m=murajaahPlan(d),mToday=logsOn(d,'murajaah');
+  const hasAny=m.flagged.length||m.dekat.length||m.jauh.length;
+  h+='<div class="card"><h2>🔁 Murajaah (mengulang hafalan)</h2>';
+  if(!hasAny){
+    h+='<p class="muted" style="margin:6px 0">Belum ada hafalan untuk diulang. Mulai dari hafalan baru dulu ya — insyaAllah setelah itu daftar murajaah muncul otomatis di sini.</p>';
+  }else{
+    if(m.flagged.length)h+='<h3>⚠️ Prioritas (ditandai perlu diulang)</h3><div class="chips">'+m.flagged.map(x=>'<span class="chip flag link" data-act="openread" data-no="'+x.no+'" data-from="'+x.from+'" data-to="'+x.to+'">'+esc(lbl(x))+' ▸</span>').join('')+'</div>';
+    if(m.dekat.length)h+='<h3>Hafalan terbaru — ulang 3–5×</h3><div class="chips">'+m.dekat.map(x=>'<span class="chip link" data-act="openread" data-no="'+x.no+'" data-from="'+x.from+'" data-to="'+x.to+'">'+esc(lbl(x))+' ▸</span>').join('')+'</div>';
+    if(m.jauh.length)h+='<h3>Hafalan lama (giliran hari ini) — ulang 1–2×</h3><div class="chips">'+m.jauh.map(x=>'<span class="chip link" data-act="openread" data-no="'+x.no+'" data-from="'+x.from+'" data-to="'+x.to+'">'+esc(lbl(x))+' ▸</span>').join('')+'</div><div class="hint">Hafalan lama dibagi '+m.chunks+' giliran yang bergantian tiap hari.</div>';
+    if(mToday.length){
+      h+='<div class="done-box">✓ Murajaah hari ini sudah dicatat ('+mToday.map(e=>QUAL[e.quality]).join(', ')+')</div><button class="btn btn-ghost" data-act="mshow">Catat lagi</button>';
+    }else{
+      h+='<div class="field" style="margin-top:12px"><input type="text" id="mNote" placeholder="Catatan (opsional)"></div><div class="muted small" style="margin-bottom:6px">Bagaimana murajaahnya?</div>'+
+        '<div class="row">'+Object.keys(QUAL).map(k=>'<button class="btn btn-q" data-act="murajaah" data-q="'+k+'">'+(k==='lancar'?'😊 ':k==='salah'?'🤔 ':'🔁 ')+QUAL[k]+'</button>').join('')+'</div>'+
+        '<div class="hint">“Perlu diulang” akan menandai surah-surah ini sebagai prioritas besok. “Lancar” menghapus tandanya.</div>';
+    }
+  }
+  h+='</div>';
+  if(cur&&!sim.weekly)h+='<div class="info-box">Jadwal pekananmu belum punya hari hafalan baru. Atur di tab <b>Jadwal & Atur</b>.</div>';
+  return h;
+}
+
+function vJadwal(){
+  const order=[1,2,3,4,5,6,0],sim=simulate();
+  let h='<div class="card"><h2>🗓️ Pola pekanan</h2><p class="muted small" style="margin-top:0">Disusun mengikuti kesibukanmu: mengajar Selasa–Kamis, kuliah Jumat–Sabtu, tahsin Ahad pagi. Sesuaikan jamnya dengan jadwal gym/zumba — semua isian tersimpan otomatis.</p>';
+  order.forEach(i=>{
+    const w=state.week[i];
+    h+='<div class="weekrow"><div class="dn">'+HARI[i]+'</div>'+
+      '<select data-wk="'+i+'" data-f="type">'+Object.keys(TYPES).map(k=>'<option value="'+k+'"'+(w.type===k?' selected':'')+'>'+TYPES[k].label+'</option>').join('')+'</select>'+
+      '<div class="fields"><input type="text" data-wk="'+i+'" data-f="time" value="'+esc(w.time)+'" placeholder="Waktu, mis. ba\'da Subuh"><input type="text" data-wk="'+i+'" data-f="note" value="'+esc(w.note)+'" placeholder="Catatan"></div></div>';
+  });
+  h+='</div>';
+  const t=+state.settings.target;
+  h+='<div class="card"><h2>⚙️ Atur program</h2>'+
+    '<div class="field"><label>Target hafalan baru di hari “penuh”</label><select data-set="target">'+[1,2,3,4,5,6,7,8,10].map(n=>'<option value="'+n+'"'+(t===n?' selected':'')+'>'+n+' ayat</option>').join('')+'</select><div class="hint">Hari “ringan” otomatis setengahnya ('+Math.max(1,Math.ceil(t/2))+' ayat). Satu sesi selalu dalam satu surah.</div></div>'+
+    '<div class="field"><label>Urutan menghafal</label><div class="seg">'+
+      '<label><input type="radio" name="ord" data-set="order" value="nas"'+(state.settings.order==='nas'?' checked':'')+'><span>An-Nas → An-Naba\' (disarankan, dari yang pendek)</span></label>'+
+      '<label><input type="radio" name="ord" data-set="order" value="naba"'+(state.settings.order==='naba'?' checked':'')+'><span>An-Naba\' → An-Nas</span></label></div></div>'+
+    '<div class="field"><label>Tanggal mulai</label><input type="date" data-set="startDate" value="'+esc(state.settings.startDate)+'"></div>'+
+    '<div class="info-box">Dengan pengaturan ini: <b>'+sim.weekly+' ayat baru per pekan</b>'+(sim.end?' → perkiraan selesai Juz 30 <b>'+fmt(sim.end)+'</b>.':'.')+' Ingat: surah di akhir (An-Naba\', An-Nazi\'at, \'Abasa) ayatnya lebih panjang — tidak apa-apa turunkan target saat sampai di sana.</div>'+
+    '<div class="hint">Sudah ada surah yang hafal sebelumnya? Tandai di tab <b>Progres Surah</b> supaya rencananya langsung menyesuaikan.</div>'+
+    '<div class="row" style="margin-top:14px"><button class="btn btn-red" data-act="reset">Hapus semua & mulai ulang</button></div></div>';
+  h+=vSync();
+  return h;
+}
+
+let showAll=false;
+function vRencana(){
+  const sim=simulate(),cur=current();
+  if(!cur)return'<div class="card empty">Semua surah sudah hafal — tidak ada rencana hafalan baru. Teruskan murajaah ya! 🌿</div>';
+  if(!sim.weekly)return'<div class="card empty">Belum ada hari hafalan baru di pola pekanan. Atur di tab Jadwal & Atur.</div>';
+  const list=showAll?sim.sessions:sim.sessions.slice(0,28);
+  let h='<div class="card"><h2>🧭 Rencana hafalan baru</h2><p class="muted small" style="margin-top:0">'+sim.sessions.length+' sesi lagi · perkiraan selesai <b>'+fmt(sim.end)+'</b>. Rencana menyesuaikan otomatis bila ada hari terlewat atau bonus.</p>';
+  let lastWk=null;const today=todayStr();
+  list.forEach(s=>{
+    const d=parse(s.date),mon=addDays(s.date,-((d.getDay()+6)%7));
+    if(mon!==lastWk){lastWk=mon;h+='<div class="plan-wk">Pekan '+parse(mon).getDate()+' '+BULAN[parse(mon).getMonth()].slice(0,3)+'</div>'}
+    const fullS=s.from===1&&s.to===BY[s.surah].n;
+    h+='<div class="plan-item'+(s.date===today?' today':'')+'"><div class="d">'+fmtShort(s.date)+(s.date===today?' · <b>hari ini</b>':'')+'</div><div><b>QS. '+BY[s.surah].name+'</b> '+(fullS?'(utuh)':'ayat '+s.from+'–'+s.to)+(s.to===BY[s.surah].n?' <span class="badge t-full">selesai surah</span>':'')+'</div><div class="ar" style="font-size:19px;color:var(--navy)">'+BY[s.surah].ar+'</div></div>';
+  });
+  if(sim.sessions.length>28)h+='<div class="row" style="margin-top:10px"><button class="btn btn-soft" data-act="toggleall">'+(showAll?'Tampilkan lebih sedikit':'Tampilkan semua '+sim.sessions.length+' sesi')+'</button></div>';
+  return h+'</div>';
+}
+
+function vProgres(){
+  const cur=current();
+  let h='<div class="card"><h2>📚 Progres per surah</h2><p class="muted small" style="margin-top:0">Ketuk surah untuk mengubah jumlah ayat yang sudah hafal, menandai mutqin, atau “perlu diulang”.</p>'+
+    '<div class="legend"><span><i class="dot" style="background:#cfd6e2"></i>Belum</span><span><i class="dot" style="background:var(--blue)"></i>Proses</span><span><i class="dot" style="background:var(--green)"></i>Hafal</span><span><i class="dot" style="background:var(--gold)"></i>Mutqin (sangat kuat)</span><span>⚠️ perlu diulang</span></div><div class="grid">';
+  orderList().forEach(no=>{
+    const s=BY[no],p=P(no),full=p.done>=s.n,cls=p.mutqin&&full?'mutqin':full?'hafal':'';
+    const stat=p.mutqin&&full?'Mutqin':full?'Hafal':p.done>0?'Proses':'Belum';
+    h+='<button class="sur '+cls+(no===cur?' now':'')+'" data-act="editsur" data-no="'+no+'"><div class="no">'+no+(p.flag?' ⚠️':'')+'</div><div class="nm">'+s.name+'</div><span class="ar">'+s.ar+'</span><div class="mini"><i style="width:'+Math.min(100,p.done/s.n*100)+'%"></i></div><div class="small muted">'+Math.min(p.done,s.n)+'/'+s.n+' ayat · '+stat+'</div></button>';
+  });
+  return h+'</div></div>';
+}
+
+function vRiwayat(){
+  const L=[...state.log].sort((a,b)=>b.ts-a.ts);
+  if(!L.length)return'<div class="card empty">Belum ada catatan. Setiap kali kamu menekan “Sudah hafal” atau mencatat murajaah, riwayatnya muncul di sini.</div>';
+  const z=L.filter(e=>e.type==='ziyadah').length,m=L.length-z;
+  let h='<div class="card"><h2>🗒️ Riwayat</h2><p class="muted small" style="margin-top:0">'+z+' sesi hafalan baru · '+m+' sesi murajaah. Tekan ✕ untuk menghapus catatan yang salah (bisa di-Undo).</p>';
+  L.forEach(e=>{
+    h+='<div class="log"><div class="body"><div class="small muted">'+fmt(e.date)+'</div>';
+    if(e.type==='ziyadah')h+='<div><span class="badge t-full">Hafalan baru</span> <b>QS. '+esc(BY[e.surah]?BY[e.surah].name:e.surah)+'</b> ayat '+e.from+'–'+e.to+'</div>';
+    else h+='<div><span class="badge t-murajaah">Murajaah</span> '+esc(QUAL[e.quality]||'')+' <span class="small muted">· '+esc((e.items||[]).join(', '))+'</span></div>';
+    if(e.note)h+='<div class="small">📝 '+esc(e.note)+'</div>';
+    h+='</div><button class="x" data-act="dellog" data-id="'+esc(e.id)+'" title="Hapus">✕</button></div>';
+  });
+  return h+'</div>';
+}
+
+function vPanduan(){
+  return '<div class="card guide"><h2>🌱 Cara memakai program ini</h2><ol>'+
+  '<li>Buka tab <b>Hari Ini</b> setiap pagi. Di sana sudah tertulis ayat yang dihafal dan surah yang dimurajaah.</li>'+
+  '<li>Setelah hafal, tekan <b>✓ Sudah hafal</b>. Progres dan rencana ke depan menyesuaikan otomatis.</li>'+
+  '<li>Hari terlewat? Tidak apa-apa. Tidak ada “utang”: rencana mundur dengan sendirinya. Yang penting jangan berhenti.</li>'+
+  '<li>Salah tekan? Pakai <b>↶ Undo</b> di atas, atau hapus catatan di tab Riwayat.</li></ol></div>'+
+  '<div class="card guide"><h2>🕌 Kiat menghafal untuk jadwal padat</h2><ul>'+
+  '<li><b>Sedikit tapi rutin</b> lebih kuat daripada banyak tapi jarang. 2 ayat setiap hari lebih awet daripada 1 surah sekali sepekan.</li>'+
+  '<li><b>Waktu terbaik: ba\'da Subuh</b>, sebelum pikiran penuh urusan sekolah dan kampus.</li>'+
+  '<li><b>Murajaah lebih penting dari tambah hafalan.</b> Kalau sedang sangat sibuk, utamakan murajaah dan tunda hafalan baru.</li>'+
+  '<li><b>Pakai dalam shalat</b>: fardhu, rawatib, Dhuha, dan witir adalah murajaah yang paling alami.</li>'+
+  '<li><b>Dengarkan murattal</b> di perjalanan ke SMPN 5 atau ke kampus. Pilih satu qari dengan tempo pelan dan pakai terus agar iramanya melekat.</li>'+
+  '<li><b>Benarkan bacaan dulu</b>: setorkan bacaan yang mau dihafal ke ustadzah tahsin pada hari Ahad agar tidak terlanjur hafal dengan bacaan yang keliru.</li>'+
+  '<li><b>Punya penyimak</b>: minta suami, anak, atau teman menyimak setoran pekanan. Ini sekaligus jadi pengingat.</li>'+
+  '<li>Saat sampai di surah panjang (An-Naba\', An-Nazi\'at, \'Abasa), wajar kalau target diturunkan jadi 2–3 ayat.</li></ul></div>'+
+  '<div class="card guide"><h2>💚 Niat</h2><p class="ar" style="font-size:24px;text-align:center;margin:6px 0">خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ</p><p class="muted" style="text-align:center;margin-top:0">“Sebaik-baik kalian adalah yang belajar Al-Qur\'an dan mengajarkannya.” (HR. Al-Bukhari)</p></div>';
+}
+
+/* ===== Rekap Ibadah Harian ===== */
+const FARDHU=['Subuh','Dzuhur','Ashar','Maghrib','Isya'];
+const IBI=[
+ {id:'rawatib',g:'Shalat Sunnah',n:'Rawatib',haidOff:1},
+ {id:'dhuha',g:'Shalat Sunnah',n:'Dhuha',haidOff:1},
+ {id:'tahajud',g:'Shalat Sunnah',n:'Tahajud / qiyamul lail',haidOff:1},
+ {id:'witir',g:'Shalat Sunnah',n:'Witir',haidOff:1},
+ {id:'tilawah',g:"Al-Qur'an",n:'Tilawah',num:'halaman'},
+ {id:'ziyadah',g:"Al-Qur'an",n:'Hafalan baru',auto:'ziyadah'},
+ {id:'murajaah',g:"Al-Qur'an",n:'Murajaah',auto:'murajaah'},
+ {id:'tahsin',g:"Al-Qur'an",n:'Kelas tahsin',days:[0],sub:'khusus Ahad'},
+ {id:'dzpagi',g:'Dzikir',n:'Dzikir pagi',auto:'pagi'},
+ {id:'dzpetang',g:'Dzikir',n:'Dzikir petang',auto:'petang'},
+ {id:'dzsalah',g:'Dzikir',n:'Dzikir setelah shalat',auto:'salah',haidOff:1},
+ {id:'sedekah',g:'Amal Lainnya',n:'Sedekah'},
+ {id:'puasa',g:'Amal Lainnya',n:'Puasa sunnah',haidOff:1},
+ {id:'ilmu',g:'Amal Lainnya',n:'Kajian / membaca ilmu'}
+];
+let ibDate=null,ibMode='hari';
+const ibAll=()=>IBI.concat((state.ib.custom||[]).map(c=>({id:c.id,g:'Tambahan',n:c.n})));
+const ibItems=()=>ibAll().filter(x=>!(state.ib.off||[]).includes(x.id));
+const ibDay=d=>state.ib.days[d]||{};
+function ibSet(d,obj){state.ib.days[d]=Object.assign({},state.ib.days[d]||{},obj)}
+function ibActive(d,it){const D=ibDay(d);if(it.days&&!it.days.includes(parse(d).getDay()))return false;if(D.haid&&it.haidOff)return false;return true}
+function ibVal(d,it){
+  const D=ibDay(d),k=D.k||{};
+  if(it.auto==='ziyadah'||it.auto==='murajaah')return state.log.some(e=>e.date===d&&e.type===it.auto)?1:0;
+  if(it.auto==='pagi'||it.auto==='petang')return (state.dzLog[d]||{})[it.auto]?1:0;
+  if(it.auto==='salah')return Math.min(1,((state.dzLog[d]||{}).shalat||[]).length/5);
+  if(it.num)return +k[it.id]>0?1:0;
+  return k[it.id]?1:0;
+}
+function ibScore(d){const D=ibDay(d);let tot=0,got=0;
+  if(!D.haid){tot+=5;got+=FARDHU.filter(f=>(D.s||{})[f]).length}
+  ibItems().forEach(it=>{if(ibActive(d,it)){tot++;got+=ibVal(d,it)}});return tot?got/tot:0}
+function ibFirst(){const c=[...Object.keys(state.ib.days),...state.log.map(e=>e.date),...Object.keys(state.dzLog)].sort();return c[0]||todayStr()}
+const pct=x=>Math.round(x*100)+'%';
+const heat=x=>x<=0?'#f3f0f8':x<.34?'#e3dcfb':x<.67?'#c9bdf7':x<.9?'#a9e3c8':'#7fd3ad';
+function vIbadah(){
+  const today=todayStr();if(!ibDate||ibDate>today)ibDate=today;
+  let h='<div class="card"><h2>🕌 Ibadah Harian</h2><p class="small muted" style="margin:0">Mutaba\'ah yaumiyah. Hafalan, murajaah, dan dzikir tercentang otomatis dari tab lain.</p>'+
+   '<div class="seg2">'+[['hari','Harian'],['pekan','Pekan'],['bulan','Bulan']].map(([k,l])=>'<button class="'+(ibMode===k?'on':'')+'" data-act="ibmode" data-m="'+k+'">'+l+'</button>').join('')+'</div></div>';
+  return h+(ibMode==='pekan'?vIbWeek():ibMode==='bulan'?vIbMonth():vIbDayV());
+}
+function vIbDayV(){
+  const d=ibDate,today=todayStr(),D=ibDay(d),sc=ibScore(d);
+  let h='<div class="card"><div class="datenav"><button data-act="ibnav" data-n="-1">‹</button><div style="text-align:center"><b>'+fmt(d)+'</b>'+(d===today?'<div class="small muted">hari ini</div>':'<div><button class="btn btn-ghost" style="padding:2px" data-act="ibtoday">ke hari ini</button></div>')+'</div><button data-act="ibnav" data-n="1"'+(d>=today?' disabled':'')+'>›</button></div>'+
+   '<div class="ibscore" style="margin-top:8px"><div class="ring" id="ibRing" style="background:conic-gradient(#9b8ff0 '+(sc*360)+'deg,#efeaf7 0)"><b id="ibScore">'+pct(sc)+'</b></div><div><div style="font-weight:700">Capaian ibadah hari ini</div><div class="small muted">Dihitung dari ibadah yang aktif di hari ini.</div>'+
+   '<span class="toggle'+(D.haid?' on':'')+'" style="margin-top:6px" data-act="ibhaid">🌸 Sedang berhalangan</span></div></div></div>';
+  h+='<div class="card"><h2>Shalat fardhu</h2>';
+  if(D.haid)h+='<div class="info-box">Sedang berhalangan, jadi shalat dan puasa tidak dihitung. Dzikir, doa, dan amal lain tetap tercatat.</div>';
+  else h+='<div class="fardhu">'+FARDHU.map(f=>{const v=(D.s||{})[f]||0;return '<button class="fb s'+v+'" data-act="ibf" data-f="'+f+'"><i>'+(v===2?'⭐':v===1?'✓':'')+'</i>'+f+'</button>'}).join('')+'</div><div class="hint">Ketuk sekali: ✓ dikerjakan · dua kali: ⭐ di awal waktu · tiga kali: hapus</div>';
+  h+='</div>';
+  const groups={};ibItems().forEach(it=>{(groups[it.g]=groups[it.g]||[]).push(it)});
+  Object.keys(groups).forEach(g=>{
+    const rows=groups[g].filter(it=>ibActive(d,it)||(it.days&&false));if(!rows.length)return;
+    h+='<div class="card"><h2>'+esc(g)+'</h2>';
+    rows.forEach(it=>{const v=ibVal(d,it),k=(D.k||{});
+      h+='<div class="ibrow"><div><div class="nm">'+esc(it.n)+'</div>'+(it.sub?'<div class="sub">'+esc(it.sub)+'</div>':'')+(it.auto==='salah'?'<div class="sub">'+(((state.dzLog[d]||{}).shalat||[]).length)+'/5 shalat</div>':'')+(it.auto?'<div class="sub">otomatis dari tab '+(it.auto==='ziyadah'||it.auto==='murajaah'?'Hari Ini':'Dzikir')+'</div>':'')+'</div>';
+      if(it.num)h+='<div class="row" style="flex-wrap:nowrap"><input type="number" min="0" class="ibnum" data-ibnum="'+it.id+'" value="'+(k[it.id]||'')+'" placeholder="0"><span class="small muted">'+it.num+'</span></div>';
+      else if(it.auto)h+='<button class="tg auto'+(v>=1?' on':'')+'" data-act="ibgo" data-to="'+it.auto+'">'+(v>=1?'✓ Selesai':v>0?Math.round(v*5)+'/5 ›':'Buka ›')+'</button>';
+      else h+='<button class="tg'+(v?' on':'')+'" data-act="ibk" data-id="'+it.id+'">✓</button>';
+      h+='</div>'});
+    h+='</div>';
+  });
+  h+='<div class="card"><h2>📝 Catatan / muhasabah</h2><textarea rows="3" data-ibnote="1" placeholder="Apa yang disyukuri dan ingin diperbaiki hari ini?">'+esc(D.note||'')+'</textarea>'+
+     '<div class="row" style="margin-top:10px"><button class="btn btn-ghost" data-act="ibset">⚙ Atur daftar ibadah</button></div></div>';
+  return h;
+}
+function weekStart(d){const x=parse(d);return addDays(d,-((x.getDay()+6)%7))}
+function vIbWeek(){
+  const ws=weekStart(ibDate),days=[0,1,2,3,4,5,6].map(i=>addDays(ws,i)),today=todayStr(),first=ibFirst(),no=d=>d>today||d<first,HS=['Ahd','Sen','Sel','Rab','Kam','Jum','Sab'];
+  let h='<div class="card"><div class="datenav"><button data-act="ibnav" data-n="-7">‹</button><b>'+parse(ws).getDate()+' '+BULAN[parse(ws).getMonth()].slice(0,3)+' – '+parse(days[6]).getDate()+' '+BULAN[parse(days[6]).getMonth()].slice(0,3)+' '+parse(days[6]).getFullYear()+'</b><button data-act="ibnav" data-n="7"'+(days[6]>=today?' disabled':'')+'>›</button></div>';
+  h+='<div style="overflow-x:auto"><table class="wk"><tr><th></th>'+days.map(d=>'<th>'+HS[parse(d).getDay()]+'<br>'+parse(d).getDate()+'</th>').join('')+'</tr>';
+  h+='<tr><td class="lbl">Shalat fardhu</td>'+days.map(d=>{const D=ibDay(d);if(no(d))return '<td class="na">·</td>';if(D.haid)return '<td class="na">🌸</td>';const n=FARDHU.filter(f=>(D.s||{})[f]).length;return '<td class="'+(n===5?'y':'')+'">'+n+'/5</td>'}).join('')+'</tr>';
+  ibItems().forEach(it=>{h+='<tr><td class="lbl">'+esc(it.n)+'</td>'+days.map(d=>{if(no(d))return '<td class="na">·</td>';if(!ibActive(d,it))return '<td class="na">–</td>';const v=ibVal(d,it);return '<td class="'+(v>=1?'y':'')+'">'+(v>=1?'✓':v>0?Math.round(v*5)+'/5':'')+'</td>'}).join('')+'</tr>'});
+  h+='<tr><td class="lbl"><b>Skor</b></td>'+days.map(d=>no(d)?'<td class="na">·</td>':'<td style="background:'+heat(ibScore(d))+'"><b>'+Math.round(ibScore(d)*100)+'</b></td>').join('')+'</tr></table></div>';
+  const past=days.filter(d=>d<=today&&d>=ibFirst());const avg=past.length?past.reduce((a,d)=>a+ibScore(d),0)/past.length:0;
+  h+='<div class="hint">Rata-rata pekan ini: <b>'+pct(avg)+'</b>. Ketuk ‹ › untuk pekan lain.</div></div>';
+  return h;
+}
+function vIbMonth(){
+  const x=parse(ibDate),y=x.getFullYear(),m=x.getMonth(),today=todayStr(),first=ibFirst();
+  const n=new Date(y,m+1,0).getDate(),days=[];for(let i=1;i<=n;i++)days.push(ymd(new Date(y,m,i)));
+  const past=days.filter(d=>d<=today&&d>=first);
+  let h='<div class="card"><div class="datenav"><button data-act="ibmon" data-n="-1">‹</button><b>'+BULAN[m]+' '+y+'</b><button data-act="ibmon" data-n="1"'+(days[n-1]>=today?' disabled':'')+'>›</button></div>';
+  h+='<div class="cal">'+['Sen','Sel','Rab','Kam','Jum','Sab','Ahd'].map(t=>'<div class="h">'+t+'</div>').join('');
+  for(let i=0;i<(new Date(y,m,1).getDay()+6)%7;i++)h+='<div></div>';
+  days.forEach(d=>{const fut=d>today||d<first,sc=fut?0:ibScore(d),D=ibDay(d);h+='<button data-act="ibday" data-d="'+d+'" class="'+(d===today?'td':'')+'" style="background:'+(fut?'#fbfaff':heat(sc))+'"'+(fut?' disabled':'')+'>'+parse(d).getDate()+'<small>'+(D.haid?'🌸':fut?'':Math.round(sc*100))+'</small></button>'});
+  h+='</div><div class="hint">Warna makin hijau = capaian makin penuh. Ketuk tanggal untuk mengisi atau melihat hari itu.</div></div>';
+  const avg=past.length?past.reduce((a,d)=>a+ibScore(d),0)/past.length:0;
+  const fullSh=past.filter(d=>{const D=ibDay(d);return !D.haid&&FARDHU.every(f=>(D.s||{})[f])}).length;
+  const awal=past.reduce((a,d)=>a+FARDHU.filter(f=>(ibDay(d).s||{})[f]===2).length,0);
+  const til=past.reduce((a,d)=>a+(+((ibDay(d).k||{}).tilawah)||0),0);
+  const ay=state.log.filter(e=>e.type==='ziyadah'&&e.date.slice(0,7)===days[0].slice(0,7)).reduce((a,e)=>a+e.to-e.from+1,0);
+  h+='<div class="stats" style="margin-bottom:12px"><div class="stat"><b>'+pct(avg)+'</b><span>rata-rata capaian</span></div><div class="stat"><b>'+fullSh+' hari</b><span>shalat 5 waktu lengkap</span></div><div class="stat"><b>'+til+' hlm</b><span>tilawah bulan ini</span></div><div class="stat"><b>'+ay+' ayat</b><span>hafalan baru</span></div></div>';
+  h+='<div class="card"><h2>Konsistensi per ibadah</h2><p class="small muted" style="margin-top:0">'+past.length+' hari tercatat · '+awal+'× shalat di awal waktu</p>';
+  const rowsAll=[{n:'Shalat fardhu (5 waktu)',f:d=>ibDay(d).haid?null:FARDHU.filter(f=>(ibDay(d).s||{})[f]).length/5}].concat(ibItems().map(it=>({n:it.n,f:d=>ibActive(d,it)?ibVal(d,it):null})));
+  rowsAll.forEach(r=>{const vals=past.map(r.f).filter(v=>v!==null);const p=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+    h+='<div class="ibbar"><div>'+esc(r.n)+'<div class="bb"><i style="width:'+(p*100)+'%"></i></div></div><b style="text-align:right">'+pct(p)+'</b></div>'});
+  return h+'</div>';
+}
+function ibSettings(){
+  const off=state.ib.off||[];
+  openModal('<h3>⚙ Atur daftar ibadah</h3><p class="small muted" style="margin-top:0">Matikan yang tidak ingin dipantau, atau tambah ibadah sendiri.</p>'+
+   ibAll().map(it=>'<label class="row small" style="padding:6px 0;border-top:1px solid var(--line);justify-content:space-between"><span><input type="checkbox" data-iboff="'+it.id+'"'+(off.includes(it.id)?'':' checked')+'> '+esc(it.n)+(it.g==='Tambahan'?'':' <span class="muted">· '+esc(it.g)+'</span>')+'</span>'+(it.g==='Tambahan'?'<button class="x" data-act="ibdel" data-id="'+it.id+'">✕</button>':'')+'</label>').join('')+
+   '<div class="row" style="margin-top:12px;flex-wrap:nowrap"><input type="text" id="ibNew" placeholder="mis. Membaca Al-Kahfi (Jumat)"><button class="btn btn-primary" data-act="ibadd">Tambah</button></div>'+
+   '<div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn btn-soft" data-act="close">Selesai</button></div>');
+}
+function ibRefreshScore(){const e=document.getElementById('ibScore'),r=document.getElementById('ibRing');if(e){const sc=ibScore(ibDate);e.textContent=pct(sc);r.style.background='conic-gradient(#9b8ff0 '+(sc*360)+'deg,#efeaf7 0)'}}
+
+/* ===== Baca & Dengar ===== */
+let QT=null,qtErr=false,hl=null,readNo=null;
+const arNum=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+function loadText(){
+  if(QT||qtErr)return;
+  fetch('juz30.json').then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>{QT=j;if(tab==='baca')render()}).catch(()=>{qtErr=true;if(tab==='baca')render()});
+}
+function vBaca(){
+  loadText();
+  const no=readNo||current()||114,s=BY[no],st=state.settings;
+  let h='<div class="card"><div class="daybar"><div><div class="muted small">Baca & dengarkan</div><h2>QS. '+s.name+' <span class="ar" style="font-size:24px;color:var(--navy)">'+s.ar+'</span></h2><div class="small muted">Surah ke-'+no+' · '+s.n+' ayat'+(hl&&hl.no===no?' · ditandai: ayat '+hl.from+'–'+hl.to:'')+'</div></div>'+
+    '<select id="readSel" style="width:auto">'+orderList().map(n=>'<option value="'+n+'"'+(n===no?' selected':'')+'>'+n+'. '+BY[n].name+'</option>').join('')+'</select></div>'+
+    '<div class="readbar"><button class="btn btn-primary" data-act="play" data-no="'+no+'">🎧 Putar murattal</button>'+
+    '<span class="toggle'+(st.showTr!==false?' on':'')+'" data-act="tgTr">Terjemahan</span>'+
+    '<span class="toggle'+(st.hideMode?' on':'')+'" data-act="tgHide">🙈 Mode uji hafalan</span>'+
+    '<a class="small" href="https://quran.com/'+no+'?startingVerse='+(hl&&hl.no===no?hl.from:1)+'" target="_blank" rel="noopener">Putar per ayat di Quran.com ↗</a></div>'+
+    (st.hideMode?'<div class="info-box">Mode uji: teks disamarkan. Lafalkan dulu dari hafalan, lalu ketuk ayat untuk mencocokkan.</div>':'')+
+    '</div><div class="card">';
+  if(!QT){h+=qtErr?'<div class="empty">Teks belum bisa dimuat. Coba buka ulang halaman.</div>':'<div class="empty">Memuat teks…</div>';return h+'</div>'}
+  const v=QT[no]||[];
+  h+='<div class="q bsm">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>';
+  v.forEach((a,i)=>{const n=i+1,isH=hl&&hl.no===no&&n>=hl.from&&n<=hl.to;
+    h+='<div class="ay'+(isH?' hl':'')+(st.hideMode?' hide':'')+'" id="ay'+n+'" data-act="reveal"><span class="an">'+n+'</span><div class="q">'+esc(a[0])+' <span class="num">﴿'+arNum(n)+'﴾</span></div>'+(st.showTr!==false?'<div class="tr">'+n+'. '+esc(a[1])+'</div>':'')+'</div>'});
+  h+='<div class="hint" style="margin-top:12px">Teks Utsmani & terjemahan Kemenag dari dataset Tanzil/quran-json (CC BY-SA 4.0). Murattal: Syaikh Mishary Rasyid Al-Afasy.</div>';
+  return h+'</div>';
+}
+/* Pemutar (tetap jalan walau pindah tab) */
+const au=new Audio();au.preload='none';let pNo=null,repLeft=0;
+const pl=id=>document.getElementById(id);
+const mmss=t=>isFinite(t)?Math.floor(t/60)+':'+pad(Math.floor(t%60)):'0:00';
+function playSurah(no){
+  const rep=+pl('plRep').value;
+  if(pNo!==no){au.src='murattal-'+no+'.mp3';pNo=no}
+  repLeft=rep===0?Infinity:rep-1;au.playbackRate=+pl('plSpd').value;
+  pl('player').classList.add('show');document.body.classList.add('has-player');
+  pl('plTitle').textContent='QS. '+BY[no].name+' — Mishary Al-Afasy';
+  au.play().catch(()=>toast('Audio belum bisa diputar. Ketuk ▶ sekali lagi.'));
+}
+au.addEventListener('play',()=>pl('plPlay').textContent='⏸');
+au.addEventListener('pause',()=>pl('plPlay').textContent='▶');
+au.addEventListener('timeupdate',()=>{pl('plTime').textContent=mmss(au.currentTime)+' / '+mmss(au.duration)+(repLeft>0&&repLeft!==Infinity?' · sisa ulang '+repLeft+'×':repLeft===Infinity?' · ulang terus':'');if(au.duration)pl('plSeek').value=Math.round(au.currentTime/au.duration*1000)});
+au.addEventListener('ended',()=>{if(repLeft>0){repLeft--;au.currentTime=0;au.play().catch(()=>{})}});
+au.addEventListener('error',()=>{if(pNo)toast('File murattal belum bisa dimuat')});
+pl('plPlay').addEventListener('click',()=>{if(!pNo){playSurah(readNo||current()||114);return}au.paused?au.play().catch(()=>{}):au.pause()});
+pl('plSeek').addEventListener('input',e=>{if(au.duration)au.currentTime=e.target.value/1000*au.duration});
+pl('plSpd').addEventListener('change',e=>{au.playbackRate=+e.target.value});
+pl('plRep').addEventListener('change',e=>{const r=+e.target.value;repLeft=r===0?Infinity:r-1});
+pl('plClose').addEventListener('click',()=>{au.pause();pl('player').classList.remove('show');document.body.classList.remove('has-player')});
+
+/* ===== Dzikir ===== */
+let DZ=null,dzErr=false,dzSess=null;
+const SHALAT=['Subuh','Dzuhur','Ashar','Maghrib','Isya'];
+const DZNAME={pagi:'Dzikir Pagi',petang:'Dzikir Petang',salah:'Dzikir Setelah Shalat'};
+function loadDz(){if(DZ||dzErr)return;fetch('dzikir.json').then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>{DZ=j;if(tab==='dzikir'||tab==='today')render()}).catch(()=>{dzErr=true;if(tab==='dzikir')render()})}
+function dzCounts(){const t=todayStr();if(state.dz.date!==t){state.dz={date:t,pagi:{},petang:{},salah:{}}}return state.dz}
+function dzLogToday(){return state.dzLog[todayStr()]||{}}
+function dzSetLog(k,v){const t=todayStr();state.dzLog[t]=Object.assign({},state.dzLog[t]||{},{[k]:v});
+  const keys=Object.keys(state.dzLog).sort();while(keys.length>400)delete state.dzLog[keys.shift()]}
+function defaultSess(){const h=new Date().getHours();return h>=3&&h<11?'pagi':h>=15?'petang':'salah'}
+const nOf=(ss,i)=>{const x=DZ[ss][i];return x.opts?((state.settings.dzOpt||{})[ss+'-'+x.t]||x.n):x.n};
+const fmtAr=t=>esc(t).replace(/\((\d+)\)/g,(m,n)=>'<span class="num">﴿'+arNum(n)+'﴾</span>');
+function vDzikir(){
+  loadDz();const ss=dzSess||defaultSess(),st=state.settings,c=dzCounts()[ss]||{},L=dzLogToday();
+  let h='<div class="card"><h2>📿 Dzikir sesuai sunnah</h2><p class="muted small" style="margin:0">Susunan pagi–petang mengikuti Ustadz Yazid bin Abdul Qadir Jawas rahimahullah; semua dari hadits shahih/hasan.</p>'+
+   '<div class="seg2">'+['pagi','petang','salah'].map(k=>'<button class="'+(k===ss?'on':'')+'" data-act="dzsess" data-s="'+k+'">'+(k==='pagi'?'🌅 Pagi':k==='petang'?'🌇 Petang':'🤲 Setelah Shalat')+(k!=='salah'&&L[k]?' ✓':'')+'</button>').join('')+'</div>'+
+   '<div class="small muted">'+(ss==='pagi'?'Waktu afdhal: antara Subuh hingga terbit matahari. Jika sibuk atau lupa, boleh dibaca setelahnya.':ss==='petang'?'Waktu afdhal: antara Ashar hingga terbenam matahari. Jika sibuk atau lupa, boleh dibaca setelahnya.':'Dibaca setelah salam shalat fardhu, lalu lanjutkan dengan doa pribadi di bagian bawah.')+'</div>'+
+   '<div class="readbar"><span class="toggle'+(st.dzTr!==false?' on':'')+'" data-act="dztg" data-k="dzTr">Terjemahan</span><span class="toggle'+(st.dzLt?' on':'')+'" data-act="dztg" data-k="dzLt">Latin</span><button class="btn btn-ghost" data-act="dzreset">↺ Ulang hitungan</button></div>';
+  if(ss==='salah'){const sh=L.shalat||[];h+='<div class="small" style="font-weight:700;margin:6px 0 4px">Sudah dzikir setelah shalat:</div><div class="shchips">'+SHALAT.map(n=>'<span class="shchip'+(sh.includes(n)?' on':'')+'" data-act="dzshalat" data-n="'+n+'">'+(sh.includes(n)?'✓ ':'')+n+'</span>').join('')+'</div><div class="hint">Ketuk nama shalat setelah selesai berdzikir. Hitungan otomatis diulang untuk shalat berikutnya.</div>'}
+  h+='</div>';
+  if(!DZ)return h+'<div class="card empty">'+(dzErr?'Bacaan dzikir belum bisa dimuat. Coba buka ulang halaman.':'Memuat bacaan…')+'</div>';
+  const list=DZ[ss];let doneN=0;list.forEach((x,i)=>{if((c[i]||0)>=nOf(ss,i))doneN++});
+  h+='<div class="card" style="padding:12px 16px"><div class="daybar"><b>'+DZNAME[ss]+'</b><span class="small muted" id="dzProg">'+doneN+'/'+list.length+' bacaan tuntas</span></div><div class="dzbar"><i id="dzBar" style="width:'+(doneN/list.length*100)+'%"></i></div></div>';
+  list.forEach((x,i)=>{const N=nOf(ss,i),k=Math.min(c[i]||0,N),dn=k>=N;
+    if(x.sec)h+='<div class="plan-wk" style="margin:20px 4px 8px;font-size:12.5px">'+esc(x.sec)+'</div>';
+    h+='<div class="card dzc'+(dn?' done':'')+'" id="dz'+i+'"><div class="dzt"><b>'+(i+1)+'. '+esc(x.t)+'</b>'+(x.doa?'<span class="badge t-murajaah">doa</span>':'<span class="badge t-ringan">'+N+'×</span>')+'</div>'+
+      (x.pre?'<div class="q" style="font-size:20px;margin-bottom:0;color:#7a7592">'+esc(x.pre)+'</div>':'')+'<div class="q">'+fmtAr(x.ar)+'</div>'+
+      (st.dzLt?'<div class="lt">'+esc(x.lt)+'</div>':'')+
+      (st.dzTr!==false?'<div class="idt">'+esc(x.id)+'</div>':'')+
+      '<details><summary>Keutamaan & sumber</summary>'+(x.note?'<div style="margin-top:4px"><b>Anjuran:</b> '+esc(x.note)+'</div>':'')+(x.fw?'<div style="margin-top:4px">'+esc(x.fw)+'</div>':'')+(x.src?'<div style="margin-top:4px"><b>Sumber:</b> '+esc(x.src)+'</div>':'')+'</details>'+
+      (x.opts?'<div class="shchips" style="margin-top:10px"><span class="small muted" style="align-self:center">Target:</span>'+x.opts.map(o=>'<span class="shchip'+(o===N?' on':'')+'" data-act="dzopt" data-i="'+i+'" data-v="'+o+'">'+o+'×</span>').join('')+'</div>':'')+'<div class="cnt"><button class="minus" data-act="dzminus" data-i="'+i+'" title="Kurangi">−</button><button class="tap" data-act="dztap" data-i="'+i+'">'+(dn?'✓ Selesai ('+N+'/'+N+')':N===1?'Ketuk bila sudah dibaca':'Ketuk tiap bacaan · '+k+'/'+N)+'</button></div></div>'});
+  if(ss!=='salah')h+='<div class="card" style="text-align:center">'+(L[ss]?'<div class="done-box">✓ '+DZNAME[ss]+' hari ini sudah tuntas. Alhamdulillah.</div>':'<button class="btn btn-green" data-act="dzdone">✓ Tandai '+DZNAME[ss].toLowerCase()+' selesai</button>')+'</div>';
+  h+='<div class="hint" style="text-align:center;margin-bottom:20px">Rujukan: “Dzikir Pagi dan Petang”, Ustadz Yazid bin Abdul Qadir Jawas (almanhaj.or.id) & Hisnul Muslim. Teks Arab: dataset fitrahive/dua-dhikr (MIT). Bacaan berderajat lemah tidak dimasukkan.</div>';
+  return h;
+}
+function dzUpdate(ss,i){
+  const x=DZ[ss][i],N=nOf(ss,i),c=state.dz[ss],k=Math.min(c[i]||0,N),dn=k>=N,card=document.getElementById('dz'+i);if(!card)return;
+  card.classList.toggle('done',dn);card.querySelector('.tap').textContent=dn?'✓ Selesai ('+N+'/'+N+')':N===1?'Ketuk bila sudah dibaca':'Ketuk tiap bacaan · '+k+'/'+N;
+  let doneN=0;DZ[ss].forEach((y,j)=>{if((c[j]||0)>=nOf(ss,j))doneN++});
+  document.getElementById('dzProg').textContent=doneN+'/'+DZ[ss].length+' bacaan tuntas';document.getElementById('dzBar').style.width=(doneN/DZ[ss].length*100)+'%';
+  if(dn&&k===N&&(c[i]||0)===N){setTimeout(()=>{const nx=document.getElementById('dz'+(i+1));if(nx)nx.scrollIntoView({behavior:'smooth',block:'start'})},250)}
+  if(doneN===DZ[ss].length){
+    if(ss==='salah'){toast('MasyaAllah, dzikir tuntas. Ketuk nama shalatnya untuk menandai.')}
+    else if(!dzLogToday()[ss]){snap();dzSetLog(ss,true);persist();toast('MasyaAllah, '+DZNAME[ss].toLowerCase()+' tuntas! 🌿',true);render()}
+  }
+}
+
+function editSurah(no){
+  const s=BY[no],p=P(no);
+  openModal('<h3>QS. '+s.name+' <span class="ar" style="font-size:22px;color:var(--navy)">'+s.ar+'</span></h3><p class="muted small" style="margin-top:0">Surah ke-'+no+' · '+s.n+' ayat</p>'+
+    '<div class="field"><label>Sudah hafal sampai ayat ke-</label><input type="number" id="eDone" min="0" max="'+s.n+'" value="'+Math.min(p.done,s.n)+'"></div>'+
+    '<div class="row" style="margin-bottom:8px"><button class="btn btn-soft" data-act="efill" data-v="0">Belum</button><button class="btn btn-soft" data-act="efill" data-v="'+s.n+'">Hafal semua</button></div>'+
+    '<label class="row small" style="margin:8px 0"><input type="checkbox" id="eMut"'+(p.mutqin?' checked':'')+'> Sudah mutqin (sangat kuat, lancar tanpa ragu)</label>'+
+    '<label class="row small" style="margin:8px 0"><input type="checkbox" id="eFlag"'+(p.flag?' checked':'')+'> Perlu diulang (jadi prioritas murajaah)</label>'+
+    '<div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn btn-soft" data-act="close">Batal</button><button class="btn btn-primary" data-act="esave" data-no="'+no+'">Simpan</button></div>');
+}
+function bonusModal(){
+  const cur=current();if(!cur)return;const p=P(cur),rem=BY[cur].n-p.done;
+  openModal('<h3>Tambah hafalan baru</h3><p class="muted small" style="margin-top:0">QS. '+BY[cur].name+' mulai ayat '+(p.done+1)+' (sisa '+rem+' ayat)</p>'+
+    '<div class="field"><label>Berapa ayat yang sudah hafal?</label><input type="number" id="bN" min="1" max="'+rem+'" value="'+Math.min(rem,Math.max(1,amountFor(todayStr())||Math.ceil(state.settings.target/2)))+'"></div>'+
+    '<div class="field"><input type="text" id="bNote" placeholder="Catatan (opsional)"></div>'+
+    '<div class="row" style="justify-content:flex-end"><button class="btn btn-soft" data-act="close">Batal</button><button class="btn btn-green" data-act="bsave">✓ Catat</button></div>');
+}
+
+/* ===== Events ===== */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-tab],[data-act]');if(!t)return;
+  if(t.dataset.tab){tab=t.dataset.tab;try{localStorage.setItem(LS+'-tab',tab)}catch(x){}render();window.scrollTo({top:0,behavior:'smooth'});return}
+  const a=t.dataset.act;
+  if(a==='closebg'){if(e.target===t)closeModal();return}
+  if(a==='close'){closeModal();return}
+  if(a==='undo'){undo();document.getElementById('toastRoot').innerHTML='';return}
+  if(a==='ziyadah'){const n=document.getElementById('zNote');doZiyadah(+t.dataset.amt,n?n.value.trim():'');return}
+  if(a==='bonus'){bonusModal();return}
+  if(a==='bsave'){const n=+document.getElementById('bN').value;if(!(n>0)){toast('Isi jumlah ayat dulu ya');return}const note=document.getElementById('bNote').value.trim();closeModal();doZiyadah(n,note);return}
+  if(a==='murajaah'){const n=document.getElementById('mNote');doMurajaah(t.dataset.q,n?n.value.trim():'');return}
+  if(a==='mshow'){const old=state.log.filter(x=>x.date===todayStr()&&x.type==='murajaah');openModal('<h3>Catat murajaah lagi</h3><div class="field"><input type="text" id="mNote" placeholder="Catatan (opsional)"></div><div class="row">'+Object.keys(QUAL).map(k=>'<button class="btn btn-q" data-act="murajaah2" data-q="'+k+'">'+QUAL[k]+'</button>').join('')+'</div><div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn btn-soft" data-act="close">Tutup</button></div>');return}
+  if(a==='murajaah2'){const n=document.getElementById('mNote');const v=n?n.value.trim():'';closeModal();doMurajaah(t.dataset.q,v);return}
+  if(a==='dellog'){delLog(t.dataset.id);return}
+  if(a==='ibmode'){ibMode=t.dataset.m;render();return}
+  if(a==='ibnav'){ibDate=addDays(ibDate||todayStr(),+t.dataset.n);if(ibDate>todayStr())ibDate=todayStr();render();return}
+  if(a==='ibmon'){const x=parse(ibDate||todayStr());const d=new Date(x.getFullYear(),x.getMonth()+(+t.dataset.n),1);ibDate=ymd(d)>todayStr()?todayStr():ymd(d);render();return}
+  if(a==='ibtoday'){ibDate=todayStr();render();return}
+  if(a==='ibday'){ibDate=t.dataset.d;ibMode='hari';render();window.scrollTo({top:0,behavior:'smooth'});return}
+  if(a==='ibf'){snap();const D=ibDay(ibDate),s2=Object.assign({},D.s||{}),v=((s2[t.dataset.f]||0)+1)%3;if(v)s2[t.dataset.f]=v;else delete s2[t.dataset.f];ibSet(ibDate,{s:s2});persist();render();return}
+  if(a==='ibk'){snap();const k=Object.assign({},ibDay(ibDate).k||{});if(k[t.dataset.id])delete k[t.dataset.id];else k[t.dataset.id]=1;ibSet(ibDate,{k});persist();render();return}
+  if(a==='ibhaid'){snap();ibSet(ibDate,{haid:!ibDay(ibDate).haid});persist();render();return}
+  if(a==='ibgo'){const to=t.dataset.to;if(to==='ziyadah'||to==='murajaah'){tab='today'}else{tab='dzikir';dzSess=to}try{localStorage.setItem(LS+'-tab',tab)}catch(x){}render();window.scrollTo({top:0,behavior:'smooth'});return}
+  if(a==='ibset'){ibSettings();return}
+  if(a==='ibadd'){const v=(document.getElementById('ibNew').value||'').trim();if(!v)return;snap();state.ib.custom=[...(state.ib.custom||[]),{id:'c'+Date.now(),n:v}];persist();ibSettings();render();return}
+  if(a==='ibdel'){e.preventDefault();const id=t.dataset.id;snap();state.ib.custom=(state.ib.custom||[]).filter(c=>c.id!==id);state.ib.off=(state.ib.off||[]).filter(x=>x!==id);persist();ibSettings();render();toast('Ibadah tambahan dihapus',true);return}
+  if(a==='opentab'){tab=t.dataset.t;try{localStorage.setItem(LS+'-tab',tab)}catch(x){}render();window.scrollTo({top:0,behavior:'smooth'});return}
+  if(a==='ghon'){const v=(document.getElementById('ghTok')||{}).value||'';if(v.trim().length<20){toast('Tempel token GitHub dulu ya');return}connectGh(v);return}
+  if(a==='ghoff'){confirmBox('Putuskan sinkron?','Data tetap tersimpan di perangkat ini dan di GitHub. Perangkat ini tidak akan ikut tersinkron sampai disambungkan lagi.',disconnectGh);return}
+  if(a==='ghpull'){pull();return}
+  if(a==='exp'){exportData();return}
+  if(a==='paste'){openModal('<h3>Pindahkan data</h3><p class="small muted" style="margin-top:0">Di aplikasi versi Claude, buka <b>Jadwal & Atur</b> lalu ketuk <b>📋 Salin data</b>. Kemudian tempel di sini.</p><textarea id="pasteBox" rows="6" placeholder="Tempel data di sini"></textarea><div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn btn-soft" data-act="close">Batal</button><button class="btn btn-primary" data-act="pasteok">Pulihkan</button></div>');return}
+  if(a==='pasteok'){try{const d=JSON.parse(document.getElementById('pasteBox').value);if(!d||!d.settings||!d.progress)throw 0;snap();state=normalize(d);closeModal();persist();render();toast('Data berhasil dipindahkan ✓',true)}catch(x){toast('Data tidak dikenali. Pastikan tersalin utuh.')}return}
+  if(a==='opendz'){dzSess=t.dataset.s;tab='dzikir';try{localStorage.setItem(LS+'-tab',tab)}catch(x){}render();window.scrollTo({top:0,behavior:'smooth'});return}
+  if(a==='dzsess'){dzSess=t.dataset.s;render();return}
+  if(a==='dztg'){const k=t.dataset.k;state.settings[k]=k==='dzTr'?state.settings.dzTr===false:!state.settings.dzLt;persist();render();return}
+  if(a==='dztap'||a==='dzminus'){const ss=dzSess||defaultSess(),i=+t.dataset.i,c=dzCounts()[ss],n=nOf(ss,i);c[i]=Math.max(0,Math.min(n,(c[i]||0)+(a==='dztap'?1:-1)));persist();if(navigator.vibrate&&a==='dztap')try{navigator.vibrate(15)}catch(x){};dzUpdate(ss,i);return}
+  if(a==='dzopt'){const ss=dzSess||defaultSess(),x=DZ[ss][+t.dataset.i];state.settings.dzOpt=Object.assign({},state.settings.dzOpt||{},{[ss+'-'+x.t]:+t.dataset.v});persist();render();return}
+  if(a==='dzreset'){const ss=dzSess||defaultSess();snap();dzCounts()[ss]={};persist();render();toast('Hitungan diulang dari awal',true);return}
+  if(a==='dzdone'){const ss=dzSess||defaultSess();snap();dzSetLog(ss,true);persist();render();toast(DZNAME[ss]+' ditandai selesai',true);return}
+  if(a==='dzshalat'){const n=t.dataset.n,L=dzLogToday(),sh=[...(L.shalat||[])];snap();const was=sh.includes(n);
+    if(sh.includes(n)){dzSetLog('shalat',sh.filter(x=>x!==n))}else{sh.push(n);dzSetLog('shalat',SHALAT.filter(x=>sh.includes(x)));dzCounts().salah={}}
+    persist();render();toast(!was?'Dzikir setelah '+n+' dicatat':'Tanda '+n+' dibatalkan',true);return}
+  if(a==='openread'){readNo=+t.dataset.no;hl={no:readNo,from:+t.dataset.from,to:+t.dataset.to};tab='baca';try{localStorage.setItem(LS+'-tab',tab)}catch(x){}render();setTimeout(()=>{const el=document.getElementById('ay'+hl.from);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},250);return}
+  if(a==='play'){playSurah(+t.dataset.no);return}
+  if(a==='tgTr'){state.settings.showTr=state.settings.showTr===false;persist();render();return}
+  if(a==='tgHide'){state.settings.hideMode=!state.settings.hideMode;persist();render();return}
+  if(a==='reveal'){if(state.settings.hideMode)t.classList.toggle('hide');return}
+  if(a==='confirmok'){const cb=confirmCb;confirmCb=null;closeModal();cb&&cb();return}
+  if(a==='editsur'){editSurah(+t.dataset.no);return}
+  if(a==='efill'){document.getElementById('eDone').value=t.dataset.v;return}
+  if(a==='esave'){
+    const no=+t.dataset.no,s=BY[no];let v=Math.round(+document.getElementById('eDone').value);if(isNaN(v))v=0;v=Math.max(0,Math.min(s.n,v));
+    const mut=document.getElementById('eMut').checked&&v>=s.n,fl=document.getElementById('eFlag').checked;
+    const p=P(no);if(p.done!==v||!!p.mutqin!==mut||!!p.flag!==fl){snap();setP(no,{done:v,mutqin:mut,flag:fl});persist()}
+    closeModal();render();toast('QS. '+s.name+' diperbarui',true);return}
+  if(a==='toggleall'){showAll=!showAll;render();return}
+  if(a==='reset'){confirmBox('Hapus semua data?','Progres, riwayat, dan pola pekanan kembali ke awal. Masih bisa dibatalkan dengan Undo selama halaman ini belum ditutup.',()=>{snap();const keep=state.updatedAt;state=normalize(null);persist();render();toast('Program dimulai ulang',true)});return}
+});
+document.getElementById('undoBtn').addEventListener('click',undo);
+document.addEventListener('change',e=>{if(e.target.dataset&&e.target.dataset.iboff){snap();const id=e.target.dataset.iboff;let off=(state.ib.off||[]).filter(x=>x!==id);if(!e.target.checked)off.push(id);state.ib.off=off;persist();render();return}if(e.target.id==='impFile'&&e.target.files[0]){importData(e.target.files[0]);e.target.value='';return}if(e.target.id==='readSel'){readNo=+e.target.value;render();window.scrollTo({top:0,behavior:'smooth'})}});
+
+// Isian jadwal & pengaturan: simpan otomatis
+let editSnapTaken=false;
+document.addEventListener('focusin',e=>{if(e.target.matches('[data-wk],[data-set],[data-ibnum],[data-ibnote]')&&!editSnapTaken){snap();editSnapTaken=true}});
+document.addEventListener('focusout',e=>{if(e.target.matches('[data-wk],[data-set],[data-ibnum],[data-ibnote]'))editSnapTaken=false});
+let typeT;
+document.addEventListener('input',e=>{
+  const el=e.target;
+  if(el.dataset.ibnum){const k=Object.assign({},ibDay(ibDate).k||{});const v=Math.max(0,+el.value||0);if(v)k[el.dataset.ibnum]=v;else delete k[el.dataset.ibnum];ibSet(ibDate,{k});persist();ibRefreshScore();return}
+  if(el.dataset.ibnote){ibSet(ibDate,{note:el.value});persist();return}
+  if(el.dataset.wk!==undefined){state.week[el.dataset.wk][el.dataset.f]=el.value;persist();if(el.tagName==='SELECT')render();return}
+  if(el.dataset.set){
+    if(!editSnapTaken){snap()}
+    const k=el.dataset.set;
+    if(k==='target')state.settings.target=+el.value;
+    else if(k==='order')state.settings.order=el.value;
+    else if(k==='startDate'){if(!el.value)return;state.settings.startDate=el.value}
+    persist();clearTimeout(typeT);typeT=setTimeout(render,k==='startDate'?500:0);
+  }
+});
+
+render();
+setStatus(localOK?'local':'mem');
+initSync();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+</script>
+</body>
+</html>
