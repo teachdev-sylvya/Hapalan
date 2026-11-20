@@ -1,5 +1,5 @@
 // Penyimpan offline sederhana + penerima stiker yang dibagikan dari aplikasi lain.
-const C='hafalan-juz30-v13';
+const C='hafalan-juz30-v14';
 const CORE=['./','index.html','juz30.json','dzikir.json','manifest.json','icon-192.png','icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C&&k!=='share-inbox').map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
