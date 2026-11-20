@@ -1,4 +1,8 @@
-# Program Hafalan Juz 30
+# Jejak Hijrah
+
+Langkah demi langkah mengingat Allah.
+
+(Sebelumnya: Program Hafalan Juz 30)
 
 Aplikasi pribadi untuk menghafal Juz 30, mendengarkan murattal, serta dzikir pagi–petang dan setelah shalat.
 

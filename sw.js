@@ -1,5 +1,5 @@
 // Penyimpan offline sederhana + penerima stiker yang dibagikan dari aplikasi lain.
-const C='hafalan-juz30-v10';
+const C='hafalan-juz30-v11';
 const CORE=['./','index.html','juz30.json','dzikir.json','manifest.json','icon-192.png','icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C&&k!=='share-inbox').map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
@@ -15,7 +15,7 @@ self.addEventListener('fetch',e=>{
   }
   if(req.method!=='GET'||u.origin!==location.origin||u.pathname.endsWith('.mp3'))return;
   if(req.mode==='navigate'||u.pathname.endsWith('.json')){
-    e.respondWith(fetch(req).then(r=>{const cp=r.clone();caches.open(C).then(c=>c.put(req,cp));return r}).catch(()=>caches.match(req,{ignoreSearch:true}).then(r=>r||caches.match('index.html'))));
+    e.respondWith(fetch(req.mode==='navigate'?req.url:req,{cache:'no-cache',credentials:'same-origin'}).then(r=>{const cp=r.clone();caches.open(C).then(c=>c.put(req.mode==='navigate'?'index.html':req,cp));return r}).catch(()=>caches.match(req,{ignoreSearch:true}).then(r=>r||caches.match('index.html'))));
     return;
   }
   e.respondWith(caches.match(req).then(r=>r||fetch(req).then(res=>{const cp=res.clone();caches.open(C).then(c=>c.put(req,cp));return res})));

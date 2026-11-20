@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Program Hafalan Juz 30 — Devy</title>
+<title>Jejak Hijrah — Devy</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#efe2cd">
 <link rel="icon" href="icon-192.png">
@@ -277,6 +277,9 @@ body.has-player .wrap{padding-bottom:150px}
 .zwrap .npage{max-width:none;margin:0 auto}
 .zl{min-width:44px;text-align:center;font-size:12px;font-weight:800;align-self:center}
 .hjnavbar{display:flex;justify-content:space-between;gap:8px;margin:8px 0 4px}
+.nmhint{align-items:center;justify-content:space-between;gap:8px;background:#fbead2;color:#7a5413;border-radius:12px;padding:6px 10px;margin:6px 0;font-size:12.5px;font-weight:600}
+.nmhint button{border:0;background:#fff;border-radius:9px;padding:6px 10px;font-weight:700;cursor:pointer;color:var(--ink)}
+.top h1{display:flex;align-items:center;gap:10px}.top h1 .logo{width:38px;height:38px;border-radius:10px;box-shadow:0 2px 6px rgba(90,66,40,.2)}
 </style>
 </head>
 <body>
@@ -284,8 +287,8 @@ body.has-player .wrap{padding-bottom:150px}
   <header class="top">
     <div class="toprow">
       <div>
-        <h1>Program Hafalan Juz 30</h1>
-        <div class="sub">Jadwal personal Devy · menyesuaikan mengajar, kuliah, tahsin & olahraga</div>
+        <h1><img src="icon-192.png" alt="" class="logo">Jejak Hijrah</h1>
+        <div class="sub">Langkah demi langkah mengingat Allah · Devy</div>
       </div>
       <div class="tools">
         <span class="pill status" id="status">Memuat…</span>
@@ -508,12 +511,13 @@ function exportData(){
 function importData(file){
   const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!d.settings||!d.progress)throw 0;snap();state=normalize(d);persist();render();toast('Data dipulihkan dari cadangan',true)}catch(e){toast('File cadangan tidak dikenali')}};r.readAsText(file);
 }
+const APPV='11';
 function vSync(){
   const on=gh.token&&gh.id;
   return '<div class="card"><h2>🔄 Sinkron antar perangkat & cadangan</h2>'+
    (on?'<div class="done-box">✓ Tersambung ke GitHub. Data otomatis tersinkron antara HP, tablet, dan laptop.'+(gh.last?'<div class="small" style="font-weight:500">Terakhir disinkron: '+new Date(gh.last).toLocaleString('id-ID')+'</div>':'')+'</div><div class="row"><button class="btn btn-soft" data-act="ghpull">↻ Sinkron sekarang</button><button class="btn btn-ghost" data-act="ghoff">Putuskan</button></div>'
    :'<p class="small muted" style="margin-top:0">Supaya data sama di semua perangkat, tempel <b>token GitHub</b> (izin <i>gist</i>) sekali di tiap perangkat. Data disimpan sebagai gist <b>privat</b> di akunmu.</p><div class="field"><input type="password" id="ghTok" placeholder="Tempel token GitHub di sini (ghp_…)" autocomplete="off"></div><div class="row"><button class="btn btn-primary" data-act="ghon">Sambungkan</button><a class="small" href="https://github.com/settings/tokens/new?scopes=gist&description=Hafalan%20Juz%2030" target="_blank" rel="noopener">Buat token di GitHub ↗</a></div>')+
-   '<h3>Cadangan manual</h3><div class="row"><button class="btn btn-soft" data-act="exp">⬇ Unduh cadangan</button><label class="btn btn-soft" style="cursor:pointer">⬆ Pulihkan dari file<input type="file" id="impFile" accept=".json,application/json" style="display:none"></label></div><div class="row" style="margin-top:8px"><button class="btn btn-ghost" data-act="paste">📋 Tempel data dari aplikasi versi Claude</button></div><div class="hint">Pulihkan bisa dibatalkan dengan Undo.</div></div>';
+   '<h3>Cadangan manual</h3><div class="row"><button class="btn btn-soft" data-act="exp">⬇ Unduh cadangan</button><label class="btn btn-soft" style="cursor:pointer">⬆ Pulihkan dari file<input type="file" id="impFile" accept=".json,application/json" style="display:none"></label></div><div class="row" style="margin-top:8px"><button class="btn btn-ghost" data-act="paste">📋 Tempel data dari aplikasi versi Claude</button></div><div class="hint">Pulihkan bisa dibatalkan dengan Undo.</div><h3>Versi aplikasi</h3><div class="row"><span class="small">Jejak Hijrah · versi <b>'+APPV+'</b></span><button class="btn btn-soft" data-act="appupd">🔄 Muat versi terbaru</button></div></div>';
 }
 
 /* ===== Aksi ===== */
@@ -815,7 +819,7 @@ function vCatatan(){
     '<div class="ntools2"><div class="swatches">'+NCOL.map(c=>'<button class="sw'+(NO.color===c?' on':'')+'" data-act="ncol" data-c="'+c+'" style="background:'+c+'"></button>').join('')+'</div>'+
     '<div class="sizes">'+[[2,'S'],[3,'M'],[6,'L']].map(([v,l])=>'<button class="sz'+(NO.size===v?' on':'')+'" data-act="nsize" data-v="'+v+'">'+l+'</button>').join('')+'</div>'+
     '<div class="sizes"><button class="sz" data-act="zm" data-k="note" data-v="-">－</button><span class="zl" id="nzl">'+Math.round(ZM.note*100)+'%</span><button class="sz" data-act="zm" data-k="note" data-v="+">＋</button></div><span class="toggle'+(NO.stylus?' on':'')+'" data-act="nstylus" title="Abaikan sentuhan jari saat menulis">✒️ Hanya stylus</span></div>'+
-    '<div id="nselbar" class="nselbar" style="display:none"><button data-act="sst" data-o="small">➖</button><button data-act="sst" data-o="big">➕</button><button data-act="sst" data-o="rl">⟲</button><button data-act="sst" data-o="rr">⟳</button><button data-act="sst" data-o="dup">⧉</button><button data-act="sst" data-o="del">🗑</button><button data-act="sst" data-o="ok">✓</button></div>'+
+    '<div id="nmhint" class="nmhint" style="display:none"><span>✋ Mode geser stiker. Pena tidak menulis.</span><button data-act="ntool" data-t="pen">✏️ Kembali menulis</button></div><div id="nselbar" class="nselbar" style="display:none"><button data-act="sst" data-o="small">➖</button><button data-act="sst" data-o="big">➕</button><button data-act="sst" data-o="rl">⟲</button><button data-act="sst" data-o="rr">⟳</button><button data-act="sst" data-o="dup">⧉</button><button data-act="sst" data-o="del">🗑</button><button data-act="sst" data-o="ok">✓</button></div>'+
     '<div class="zwrap" id="nzw"><div class="npage" id="npage"><canvas id="ncv"></canvas><canvas id="nov" style="pointer-events:none;opacity:.38"></canvas><div class="nly" id="nly"></div></div></div><div class="hint" id="nstat">Tulis dengan stylus atau jari. Semua tersimpan otomatis.</div></div>';
   const idx=Object.keys(state.noteIdx||{}).sort().reverse().slice(0,30);
   h+='<div class="card"><h2>📚 Catatan lain</h2>'+(idx.length?'<div class="chips">'+idx.map(k=>'<span class="chip link'+(k===d?' flag':'')+'" data-act="opennote" data-d="'+k+'">'+fmtShort(k)+(state.noteIdx[k].d?' ✏️':'')+(state.noteIdx[k].s?' 😊':'')+'</span>').join('')+'</div>':'<p class="small muted">Belum ada catatan.</p>')+'</div>';
@@ -842,7 +846,7 @@ function applyNote(o){o=o&&!o.del?o:{};NE.st=(o.st||[]).map(x=>Object.assign({},
   NE.ctx.clearRect(0,0,NE.cv.width,NE.cv.height);NE.inked=false;
   if(o.img){const im=new Image();im.onload=()=>{if(NE&&NE.date===noteDate){NE.ctx.globalCompositeOperation='source-over';NE.ctx.globalAlpha=1;NE.ctx.drawImage(im,0,0,NE.cv.width,NE.cv.height);NE.inked=true}};im.src=o.img}
   drawStk()}
-function updToolMode(){if(!NE)return;const mv=NO.tool==='move';NE.ly.style.pointerEvents=mv?'auto':'none';NE.cv.style.cursor=mv?'default':'crosshair';if(!mv){NE.sel=null;drawStk()}}
+function updToolMode(){if(!NE)return;const mv=NO.tool==='move';const hn=document.getElementById('nmhint');if(hn)hn.style.display=mv?'flex':'none';NE.ly.style.pointerEvents=mv?'auto':'none';NE.cv.style.cursor=mv?'default':'crosshair';if(!mv){NE.sel=null;drawStk()}}
 function nstat(t){const e=document.getElementById('nstat');if(e)e.textContent=t}
 function noteDirty(){if(!NE)return;NE.dirty=true;nstat('● Menyimpan…');clearTimeout(noteT);noteT=setTimeout(noteSave,1000)}
 function fitImg(cv,lim){const enc=(c,q)=>{let u=c.toDataURL('image/webp',q);if(!u.startsWith('data:image/webp'))u=c.toDataURL('image/png');return u};
@@ -866,8 +870,8 @@ function penStyle(q){const c=tl()==='hl'?NE.octx:NE.ctx,b=NO.size*NE.dpr/ZM.note
   if(tl()==='eraser'){c.globalCompositeOperation='destination-out';c.globalAlpha=1;c.lineWidth=b*5}
   else if(tl()==='hl'){c.globalCompositeOperation='source-over';c.globalAlpha=1;c.strokeStyle=NO.color;c.lineWidth=b*5}
   else{c.globalCompositeOperation='source-over';c.globalAlpha=1;c.strokeStyle=NO.color;c.lineWidth=b*(q.t==='pen'?(.45+q.p*1.1):1)}}
-function penDown(e){if(!NE||tl()==='move'||pinchOn||drawing)return;if(NO.stylus&&e.pointerType==='touch')return;e.preventDefault();try{NE.cv.setPointerCapture(e.pointerId)}catch(x){}
-  pushHist();const q=ppt(e);drawing={id:e.pointerId,last:q,mid:null,er:!!((e.buttons&32)||e.button===5)};if(tl()!=='eraser')NE.inked=true;
+function penDown(e){if(!NE||tl()==='move'||pinchOn||drawing)return;if(e.pointerType==='pen')lastPen=Date.now();else if(e.pointerType==='touch'){if(Date.now()-lastPen<2000)return;if(NO.stylus){stylusHint();return}}e.preventDefault();try{NE.cv.setPointerCapture(e.pointerId)}catch(x){}
+  pushHist();const q=ppt(e);drawing={id:e.pointerId,last:q,mid:null,er:!!((e.buttons&32)||e.button===5),pen:e.pointerType==='pen'};if(tl()!=='eraser')NE.inked=true;
   penStyle(q);const c=tl()==='hl'?NE.octx:NE.ctx;c.beginPath();c.arc(q.x,q.y,c.lineWidth/2,0,Math.PI*2);c.fillStyle=tl()==='eraser'?'#000':NO.color;c.fill()}
 function penMove(e){if(!drawing||!NE||e.pointerId!==drawing.id||pinchOn)return;e.preventDefault();const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
   for(const ev of (evs.length?evs:[e])){const q=ppt(ev),c=tl()==='hl'?NE.octx:NE.ctx;penStyle(q);const m={x:(drawing.last.x+q.x)/2,y:(drawing.last.y+q.y)/2},s=drawing.mid||drawing.last;c.beginPath();c.moveTo(s.x,s.y);c.quadraticCurveTo(drawing.last.x,drawing.last.y,m.x,m.y);c.stroke();drawing.mid=m;drawing.last=q}}
@@ -876,17 +880,18 @@ function penUp(e){if(!drawing||e.pointerId!==drawing.id)return;drawing=null;if(N
 function drawStk(){if(!NE)return;NE.ly.innerHTML=NE.st.map((s,i)=>'<div class="stk'+(NE.sel===i?' sel':'')+'" data-si="'+i+'" style="left:'+(s.x*100)+'%;top:'+(s.y*100)+'%;width:'+(s.s*100)+'%;transform:translate(-50%,-50%) rotate('+(s.r||0)+'deg)">'+(s.k==='e'?'<span style="font-size:'+(s.s*NE.W*ZM.note*.8)+'px;line-height:1">'+s.v+'</span>':'<img src="'+s.v+'" draggable="false">')+'</div>').join('');
   const sb=document.getElementById('nselbar');if(sb)sb.style.display=NE.sel!==null&&NE.sel!==undefined&&NE.st[NE.sel]?'flex':'none'}
 let sdrag=null;
-function stkDown(e){if(!NE)return;const el=e.target.closest('.stk');if(!el){if(NE.sel!==null){NE.sel=null;drawStk()}return}
+function stkDown(e){if(!NE)return;const el=e.target.closest('.stk');if(!el){if(NE.sel!==null){NE.sel=null;drawStk()}if(NO.prevTool){const pt=NO.prevTool;NO.prevTool=null;NO.tool=pt;saveNO();document.querySelectorAll('[data-act=ntool]').forEach(b=>b.classList.toggle('on',b.dataset.t===NO.tool));updToolMode();toast('Kembali ke mode menulis ✏️')}return}
   e.preventDefault();const i=+el.dataset.si;if(NE.sel!==i){NE.sel=i;drawStk()}const r=NE.ly.getBoundingClientRect();pushHist();
   sdrag={id:e.pointerId,i,ox:(e.clientX-r.left)/r.width-NE.st[i].x,oy:(e.clientY-r.top)/r.height-NE.st[i].y,moved:false};try{NE.ly.setPointerCapture(e.pointerId)}catch(x){}}
 function stkMove(e){if(!sdrag||e.pointerId!==sdrag.id||!NE)return;e.preventDefault();const r=NE.ly.getBoundingClientRect(),s=NE.st[sdrag.i];
   s.x=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width-sdrag.ox));s.y=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height-sdrag.oy));sdrag.moved=true;
   const el=NE.ly.querySelector('[data-si="'+sdrag.i+'"]');if(el){el.style.left=(s.x*100)+'%';el.style.top=(s.y*100)+'%'}}
 function stkUp(e){if(!sdrag||e.pointerId!==sdrag.id)return;const mv=sdrag.moved;sdrag=null;if(mv)noteDirty();else if(NE)NE.hist.pop()}
-function addStkToPage(k,v,s){if(!NE)return;pushHist();NE.st.push({k,v,x:.5,y:.25+Math.random()*.3,s:s||(k==='e'?.16:.3),r:0});NE.sel=NE.st.length-1;NO.tool='move';saveNO();
+function addStkToPage(k,v,s){if(!NE)return;if(NO.tool!=='move')NO.prevTool=NO.tool;pushHist();NE.st.push({k,v,x:.5,y:.25+Math.random()*.3,s:s||(k==='e'?.16:.3),r:0});NE.sel=NE.st.length-1;NO.tool='move';saveNO();
   document.querySelectorAll('[data-act=ntool]').forEach(b=>b.classList.toggle('on',b.dataset.t==='move'));updToolMode();NE.sel=NE.st.length-1;drawStk();noteDirty()}
+function backToPen(){NO.tool=NO.prevTool&&NO.prevTool!=='move'?NO.prevTool:'pen';saveNO();document.querySelectorAll('[data-act=ntool]').forEach(b=>b.classList.toggle('on',b.dataset.t===NO.tool));updToolMode()}
 function stkOp(o){if(!NE||NE.sel===null)return;const s=NE.st[NE.sel];if(!s)return;
-  if(o==='ok'){NE.sel=null;drawStk();return}
+  if(o==='ok'){NE.sel=null;drawStk();backToPen();return}
   pushHist();if(o==='small')s.s=Math.max(.05,s.s*.82);if(o==='big')s.s=Math.min(.95,s.s*1.2);if(o==='rl')s.r=(s.r||0)-15;if(o==='rr')s.r=(s.r||0)+15;
   if(o==='dup'){NE.st.push(Object.assign({},s,{x:Math.min(.95,s.x+.06),y:Math.min(.95,s.y+.06)}));NE.sel=NE.st.length-1}
   if(o==='del'){NE.st.splice(NE.sel,1);NE.sel=null}
@@ -902,7 +907,7 @@ async function stkModal(){
     h+='<div class="stkgrid">'+'<label class="stkadd">＋<span>Tambah</span><input type="file" id="stkFile" accept="image/*,.webp" multiple style="display:none"></label>'+
       lib.map(s=>'<div class="stkit"><button data-act="pimg" data-id="'+s.id+'"><img src="'+s.data+'"></button>'+(stkManage?'<span class="stkx" data-act="delstk" data-id="'+s.id+'">✕</span>':'')+'</div>').join('')+'</div>'+
       (lib.length?'<div class="row" style="margin-top:8px"><button class="btn btn-ghost" data-act="stkman">'+(stkManage?'Selesai':'Kelola / hapus stiker')+'</button></div>':'')+
-      '<div class="info-box" style="margin-top:10px"><b>Ambil stiker dari WhatsApp:</b><br>1. Ketuk <b>＋ Tambah</b>, lalu pilih <b>File / Telusuri</b>.<br>2. Buka folder <b>Android › media › com.whatsapp › WhatsApp › Media › WhatsApp Stickers</b>.<br>3. Pilih stiker (boleh banyak sekaligus).'+(RS.share?'<br><br>Atau, kalau WhatsApp menampilkan menu <b>Bagikan</b> untuk stiker/gambar, pilih aplikasi <b>Hafalan Juz 30</b>. Stiker langsung masuk ke koleksi.':'')+'</div>'}
+      '<div class="info-box" style="margin-top:10px"><b>Ambil stiker dari WhatsApp:</b><br>1. Ketuk <b>＋ Tambah</b>, lalu pilih <b>File / Telusuri</b>.<br>2. Buka folder <b>Android › media › com.whatsapp › WhatsApp › Media › WhatsApp Stickers</b>.<br>3. Pilih stiker (boleh banyak sekaligus).'+(RS.share?'<br><br>Atau, kalau WhatsApp menampilkan menu <b>Bagikan</b> untuk stiker/gambar, pilih aplikasi <b>Jejak Hijrah</b>. Stiker langsung masuk ke koleksi.':'')+'</div>'}
   openModal(h+'<div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn btn-soft" data-act="close">Tutup</button></div>');
   if(stkTab==='my'&&RS.on()&&!stkModal.pulled){stkModal.pulled=true;RS.pullStk().then(ch=>{if(ch&&document.getElementById('stkFile'))stkModal()}).catch(()=>{})}
 }
@@ -911,7 +916,8 @@ async function addStickerFiles(files){let n=0;for(const f of files){try{const da
   if(n&&RS.on())RS.pushStk().catch(()=>{});return n}
 
 /* ===== Zoom halaman tulis ===== */
-let ZM={note:1,hj:1},pinchOn=false;try{ZM=Object.assign(ZM,JSON.parse(localStorage.getItem(LS+'-zoom')||'{}'))}catch(e){}
+let ZM={note:1,hj:1},pinchOn=false,lastPen=0,stHintShown=false;
+function stylusHint(){if(stHintShown)return;stHintShown=true;toast('“Hanya stylus” sedang aktif: jari dipakai untuk menggeser halaman. Matikan tombolnya kalau mau menulis dengan jari.')}try{ZM=Object.assign(ZM,JSON.parse(localStorage.getItem(LS+'-zoom')||'{}'))}catch(e){}
 function zApply(kind){const E=kind==='note'?NE:HE;if(!E)return;const z=ZM[kind],page=document.getElementById(kind==='note'?'npage':'hjpage');if(!page)return;
   const W=E.W*z,H=(kind==='note'?E.H:E.L.H)*z;page.style.width=W+'px';page.style.height=H+'px';page.querySelectorAll('canvas').forEach(c=>{c.style.width=W+'px';c.style.height=H+'px'});
   const lab=document.getElementById(kind==='note'?'nzl':'hjzl');if(lab)lab.textContent=Math.round(z*100)+'%';if(kind==='note')drawStk()}
@@ -921,11 +927,13 @@ function abortStroke(kind){if(kind==='note'&&drawing&&NE){drawing=null;NE.octx&&
   if(kind==='hj'&&hjd&&HE){hjd=null;const h=HE.hist.pop();if(h)HE.ctx.putImageData(h,0,0)}}
 function bindPinch(kind,wrap){if(!wrap)return;let P=null,pan=null;
   wrap.addEventListener('touchstart',e=>{
+    const penBusy=Date.now()-lastPen<1500||(drawing&&drawing.pen)||(hjd&&hjd.pen);const fingers=[...e.touches].filter(t=>t.touchType!=='stylus');
+    if(penBusy||fingers.length!==e.touches.length){P=null;pan=null;return}
     if(e.touches.length===2){e.preventDefault();pinchOn=true;pan=null;abortStroke(kind);const a=e.touches[0],b=e.touches[1],page=wrap.firstElementChild,r=page.getBoundingClientRect(),mx=(a.clientX+b.clientX)/2,my=(a.clientY+b.clientY)/2,z0=ZM[kind];
       P={d0:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)||1,z0,px:(mx-r.left)/z0,py:(my-r.top)/z0}}
     else if(e.touches.length===1&&NO.stylus&&!(kind==='note'&&NO.tool==='move')){const t=e.touches[0];pan={x:t.clientX,y:t.clientY}}},{passive:false});
   wrap.addEventListener('touchmove',e=>{
-    if(P&&e.touches.length===2){e.preventDefault();const a=e.touches[0],b=e.touches[1],d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),mx=(a.clientX+b.clientX)/2,my=(a.clientY+b.clientY)/2;
+    if(P&&e.touches.length===2&&!(Date.now()-lastPen<1500)){e.preventDefault();const a=e.touches[0],b=e.touches[1],d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),mx=(a.clientX+b.clientX)/2,my=(a.clientY+b.clientY)/2;
       setZoom(kind,P.z0*d/P.d0);const z=ZM[kind],r=wrap.firstElementChild.getBoundingClientRect();wrap.scrollLeft+=r.left-(mx-P.px*z);window.scrollBy(0,r.top-(my-P.py*z))}
     else if(pan&&e.touches.length===1&&e.touches[0].touchType!=='stylus'){e.preventDefault();const t=e.touches[0];wrap.scrollLeft-=t.clientX-pan.x;window.scrollBy(0,-(t.clientY-pan.y));pan={x:t.clientX,y:t.clientY}}},{passive:false});
   const end=e=>{if(e.touches.length<2)P=null;if(!e.touches.length){pan=null;setTimeout(()=>{pinchOn=false},60)}};
@@ -1009,9 +1017,9 @@ function mountHJ(){
 }
 let hjd=null;
 function hjPt(e){const r=HE.cv.getBoundingClientRect();return{x:(e.clientX-r.left)*HE.cv.width/r.width,y:(e.clientY-r.top)*HE.cv.height/r.height,p:e.pressure||.5,t:e.pointerType}}
-function hjDown(e){if(!HE||pinchOn||hjd)return;if(NO.stylus&&e.pointerType==='touch')return;e.preventDefault();try{HE.cv.setPointerCapture(e.pointerId)}catch(x){}
+function hjDown(e){if(!HE||pinchOn||hjd)return;if(e.pointerType==='pen')lastPen=Date.now();else if(e.pointerType==='touch'){if(Date.now()-lastPen<2000)return;if(NO.stylus){stylusHint();return}}e.preventDefault();try{HE.cv.setPointerCapture(e.pointerId)}catch(x){}
   try{HE.hist.push(HE.ctx.getImageData(0,0,HE.cv.width,HE.cv.height));if(HE.hist.length>12)HE.hist.shift()}catch(x){}
-  const q=hjPt(e);hjd={id:e.pointerId,last:q,mid:null,er:HJO.tool==='eraser'||!!((e.buttons&32)||e.button===5)};const c=HE.ctx;c.globalCompositeOperation=hjd.er?'destination-out':'source-over';c.fillStyle=hjd.er?'#000':HJO.color;c.beginPath();c.arc(q.x,q.y,HJO.size*HE.dpr/ZM.hj/2*(hjd.er?4:1),0,Math.PI*2);c.fill();c.globalCompositeOperation='source-over';document.getElementById('hjres').innerHTML=''}
+  const q=hjPt(e);hjd={id:e.pointerId,last:q,mid:null,pen:e.pointerType==='pen',er:HJO.tool==='eraser'||!!((e.buttons&32)||e.button===5)};const c=HE.ctx;c.globalCompositeOperation=hjd.er?'destination-out':'source-over';c.fillStyle=hjd.er?'#000':HJO.color;c.beginPath();c.arc(q.x,q.y,HJO.size*HE.dpr/ZM.hj/2*(hjd.er?4:1),0,Math.PI*2);c.fill();c.globalCompositeOperation='source-over';document.getElementById('hjres').innerHTML=''}
 function hjMove(e){if(!hjd||!HE||e.pointerId!==hjd.id)return;e.preventDefault();const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
   for(const ev of (evs.length?evs:[e])){const q=hjPt(ev),c=HE.ctx;c.lineCap='round';c.lineJoin='round';c.globalCompositeOperation=hjd.er?'destination-out':'source-over';c.strokeStyle=hjd.er?'#000':HJO.color;c.lineWidth=hjd.er?HJO.size*HE.dpr/ZM.hj*8:HJO.size*HE.dpr/ZM.hj*(q.t==='pen'?(.5+q.p):1);
     const m={x:(hjd.last.x+q.x)/2,y:(hjd.last.y+q.y)/2},s=hjd.mid||hjd.last;c.beginPath();c.moveTo(s.x,s.y);c.quadraticCurveTo(hjd.last.x,hjd.last.y,m.x,m.y);c.stroke();c.globalCompositeOperation='source-over';hjd.mid=m;hjd.last=q}}
@@ -1377,6 +1385,7 @@ document.addEventListener('click',e=>{
   if(a==='ghoff'){confirmBox('Putuskan sinkron?','Data tetap tersimpan di perangkat ini dan di GitHub. Perangkat ini tidak akan ikut tersinkron sampai disambungkan lagi.',disconnectGh);return}
   if(a==='ghpull'){pull();return}
   if(a==='exp'){exportData();return}
+  if(a==='appupd'){toast('Memeriksa versi terbaru…');const go=()=>location.replace(location.pathname+'?v='+Date.now());if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration){navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{}).then(()=>setTimeout(go,800))}else go();return}
   if(a==='paste'){openModal('<h3>Pindahkan data</h3><p class="small muted" style="margin-top:0">Di aplikasi versi Claude, buka <b>Jadwal & Atur</b> lalu ketuk <b>📋 Salin data</b>. Kemudian tempel di sini.</p><textarea id="pasteBox" rows="6" placeholder="Tempel data di sini"></textarea><div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn btn-soft" data-act="close">Batal</button><button class="btn btn-primary" data-act="pasteok">Pulihkan</button></div>');return}
   if(a==='pasteok'){try{const d=JSON.parse(document.getElementById('pasteBox').value);if(!d||!d.settings||!d.progress)throw 0;snap();state=normalize(d);closeModal();persist();render();toast('Data berhasil dipindahkan ✓',true)}catch(x){toast('Data tidak dikenali. Pastikan tersalin utuh.')}return}
   if(a==='opendz'){dzSess=t.dataset.s;tab='dzikir';try{localStorage.setItem(LS+'-tab',tab)}catch(x){}render();window.scrollTo({top:0,behavior:'smooth'});return}
