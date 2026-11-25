@@ -521,7 +521,7 @@ function exportData(){
 function importData(file){
   const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!d.settings||!d.progress)throw 0;snap();state=normalize(d);persist();render();toast('Data dipulihkan dari cadangan',true)}catch(e){toast('File cadangan tidak dikenali')}};r.readAsText(file);
 }
-const APPV='18';
+const APPV='19';
 function vSync(){
   const on=gh.token&&gh.id;
   return '<div class="card"><h2>🔄 Sinkron antar perangkat & cadangan</h2>'+
@@ -1303,7 +1303,7 @@ function vDzikir(){
   let h='<div class="card"><h2>📿 Dzikir sesuai sunnah</h2><p class="muted small" style="margin:0">Susunan pagi–petang mengikuti Ustadz Yazid bin Abdul Qadir Jawas rahimahullah; semua dari hadits shahih/hasan.</p>'+
    '<div class="seg2">'+['pagi','petang','salah','sunnah'].map(k=>'<button class="'+(k===ss?'on':'')+'" data-act="dzsess" data-s="'+k+'">'+(k==='pagi'?'🌅 Pagi':k==='petang'?'🌇 Petang':k==='salah'?'🤲 Setelah Shalat':'🌙 Dhuha & Malam')+((k==='pagi'||k==='petang')&&L[k]?' ✓':'')+'</button>').join('')+'</div>'+
    '<div class="small muted">'+(ss==='pagi'?'Waktu afdhal: antara Subuh hingga terbit matahari. Jika sibuk atau lupa, boleh dibaca setelahnya.':ss==='petang'?'Waktu afdhal: antara Ashar hingga terbenam matahari. Jika sibuk atau lupa, boleh dibaca setelahnya.':ss==='sunnah'?'Doa sesuai sunnah setelah shalat Dhuha, saat shalat malam (tahajud), dan saat witir.':'Dibaca setelah salam shalat fardhu, lalu lanjutkan dengan doa pribadi di bagian bawah.')+'</div>'+
-   '<div class="row" style="margin-top:10px"><button class="btn btn-green" data-act="dzplay">'+(dzPlay&&dzPlay.ss===ss?'🔊 Sedang diputar…':'▶ Putar berurutan')+'</button></div><div class="hint">Bacaan diputar satu per satu, diulang sesuai jumlah petunjuk (bisa diganti 1x saja), lalu otomatis lanjut ke bacaan berikutnya. Hitungan tercentang sendiri.</div>'+
+   '<div class="row" style="margin-top:10px"><button class="btn btn-green" data-act="dzplay">'+(dzPlay&&dzPlay.ss===ss?'🔊 Sedang diputar…':'▶ Putar berurutan')+'</button></div><div class="hint">Rekaman suara Hamad ad-Duraihim (audio resmi Hisnul Muslim) & ayat Al-Qur\'an oleh Syaikh Alafasy. Diulang sesuai jumlah petunjuk (bisa 1x saja), lalu otomatis lanjut. Hitungan tercentang sendiri. Bacaan tanpa 🎧 belum ada rekamannya: baca sendiri lalu ketuk ✓.</div>'+
    '<div class="readbar"><span class="toggle'+(st.dzTr!==false?' on':'')+'" data-act="dztg" data-k="dzTr">Terjemahan</span><span class="toggle'+(st.dzLt?' on':'')+'" data-act="dztg" data-k="dzLt">Latin</span><span class="sizes"><button class="sz" data-act="qsz" data-v="-1">A−</button><button class="sz" data-act="qsz" data-v="1">A+</button></span><button class="btn btn-ghost" data-act="dzreset">↺ Ulang hitungan</button></div>';
   if(ss==='salah'){const sh=L.shalat||[],w=dzW||defW(),ring=w==='Dzuhur'||w==='Ashar';h+='<div class="small" style="font-weight:700;margin:10px 0 4px">Bacaan untuk shalat:</div><div class="shchips">'+SHALAT.map(n=>'<span class="shchip'+(n===w?' on':'')+'" data-act="dzw" data-n="'+n+'">'+n+'</span>').join('')+'</div>'+(ring?'<div class="hint">'+(dzFull?'Menampilkan bacaan lengkap. ':'Versi ringkas untuk '+w+': istighfar, Allahumma antas salam, tasbih-tahmid-takbir, dan ayat kursi. ')+'<a href="#" data-act="dzfull" style="font-weight:700">'+(dzFull?'Ringkas lagi':'Tampilkan lengkap')+'</a></div>':'');h+='<div class="small" style="font-weight:700;margin:6px 0 4px">Sudah dzikir setelah shalat:</div><div class="shchips">'+SHALAT.map(n=>'<span class="shchip'+(sh.includes(n)?' on':'')+'" data-act="dzshalat" data-n="'+n+'">'+(sh.includes(n)?'✓ ':'')+n+'</span>').join('')+'</div><div class="hint">Ketuk nama shalat setelah selesai berdzikir. Hitungan otomatis diulang untuk shalat berikutnya.</div>'}
   h+='</div>';
@@ -1312,7 +1312,7 @@ function vDzikir(){
   h+='<div class="card" style="padding:12px 16px"><div class="daybar"><b>'+DZNAME[ss]+'</b><span class="small muted" id="dzProg">'+doneN+'/'+V.length+' bacaan tuntas</span></div><div class="dzbar"><i id="dzBar" style="width:'+(doneN/(V.length||1)*100)+'%"></i></div></div>';
   V.forEach((i,vi)=>{const x=list[i],N=nOf(ss,i),k=Math.min(c[i]||0,N),dn=k>=N;
     if(x.sec)h+='<div class="plan-wk" style="margin:20px 4px 8px;font-size:12.5px">'+esc(x.sec)+'</div>';
-    h+='<div class="card dzc'+(dn?' done':'')+(dzPlay&&dzPlay.ss===ss&&dzPlay.V[dzPlay.pos]===i?' playing':'')+'" id="dz'+i+'"><div class="dzt"><b>'+(vi+1)+'. '+esc(x.t)+'<button class="dzplay1" data-act="dzplay" data-i="'+i+'">▶ dari sini</button></b>'+(x.doa?'<span class="badge t-murajaah">doa</span>':'<span class="badge t-ringan">'+N+'×</span>')+'</div>'+
+    h+='<div class="card dzc'+(dn?' done':'')+(dzPlay&&dzPlay.ss===ss&&dzPlay.V[dzPlay.pos]===i?' playing':'')+'" id="dz'+i+'"><div class="dzt"><b>'+(vi+1)+'. '+esc(x.t)+'<button class="dzplay1" data-act="dzplay" data-i="'+i+'">'+(x.au?'🎧':'📖')+' ▶ dari sini</button></b>'+(x.doa?'<span class="badge t-murajaah">doa</span>':'<span class="badge t-ringan">'+N+'×</span>')+'</div>'+
       (x.pre?'<div class="q" style="font-size:20px;margin-bottom:0;color:#857565">'+esc(x.pre)+'</div>':'')+'<div class="q">'+fmtAr(x.ar)+'</div>'+
       (st.dzLt?'<div class="lt">'+esc(x.lt)+'</div>':'')+
       (st.dzTr!==false?'<div class="idt">'+esc(x.id)+'</div>':'')+
@@ -1355,29 +1355,19 @@ function bonusModal(){
 
 /* ===== Events ===== */
 
-/* ===== Pemutar dzikir (suara Arab bawaan HP) ===== */
-let dzPlay=null,dzWake=null,dzVoiceWarn=false;
-function arVoice(){try{const v=speechSynthesis.getVoices();return v.find(x=>/^ar[-_]?(SA)?/i.test(x.lang)&&/sa/i.test(x.lang))||v.find(x=>/^ar/i.test(x.lang))||null}catch(e){return null}}
-try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}catch(e){}
-function dzChunks(t){t=String(t).replace(/\(\d+\)/g,' ، ').replace(/[﴿﴾۝]/g,' ');const parts=t.split(/(?<=[،.؛:])\s*/);const out=[];let cur='';parts.forEach(q=>{q=q.trim();if(!q)return;if(cur&&(cur+' '+q).length>170){out.push(cur);cur=q}else cur=cur?cur+' '+q:q});if(cur)out.push(cur);
-  const fin=[];out.forEach(c=>{while(c.length>220){let k=c.lastIndexOf(' ',200);if(k<60)k=200;fin.push(c.slice(0,k));c=c.slice(k).trim()}if(c)fin.push(c)});return fin}
-function dzSpeak(text,tok,done){const ch=dzChunks(text);let k=0;
-  const next=()=>{if(!dzPlay||!dzPlay.on||dzPlay.tok!==tok)return;if(k>=ch.length){done();return}
-    const u=new SpeechSynthesisUtterance(ch[k++]);u.lang='ar-SA';const v=arVoice();if(v)u.voice=v;u.rate=state.settings.dzRate||.85;
-    let fired=false;const go=()=>{if(fired)return;fired=true;setTimeout(next,160)};
-    u.onend=go;u.onerror=e=>{if(e&&(e.error==='interrupted'||e.error==='canceled'))return;go()};
-    speechSynthesis.speak(u)};
-  next()}
+/* ===== Pemutar dzikir (rekaman suara) ===== */
+let dzPlay=null,dzWake=null;const dzAu=new Audio();dzAu.preload='auto';
 async function dzWakeOn(){try{if('wakeLock' in navigator&&!dzWake)dzWake=await navigator.wakeLock.request('screen')}catch(e){}}
 function dzWakeOff(){try{dzWake&&dzWake.release()}catch(e){}dzWake=null}
+function dzPlayList(urls,tok,done,fail){let k=0;const next=()=>{if(!dzPlay||!dzPlay.on||dzPlay.tok!==tok)return;if(k>=urls.length){done();return}
+  dzAu.onended=()=>setTimeout(next,250);dzAu.onerror=()=>{if(dzPlay&&dzPlay.tok===tok)fail()};
+  if(dzAu.getAttribute('data-u')!==urls[k]){dzAu.src=urls[k];dzAu.setAttribute('data-u',urls[k])}else dzAu.currentTime=0;
+  dzAu.playbackRate=state.settings.dzRate||1;k++;const pr=dzAu.play();if(pr)pr.catch(e=>{if(e&&e.name==='NotAllowedError'){dzPlay.on=false;dzBar();toast('Ketuk ▶ Lanjut untuk mulai memutar')}else if(dzPlay&&dzPlay.tok===tok)fail()})};next()}
 function dzPlayStart(ss,from){
-  if(!('speechSynthesis' in window)){toast('HP/browser ini belum mendukung pembacaan suara');return}
-  if(!DZ||!DZ[ss])return;try{speechSynthesis.cancel()}catch(e){}
+  if(!DZ||!DZ[ss])return;dzAu.pause();
   const V=dzVis(ss),c=dzCounts()[ss];let pos=from!=null?V.indexOf(from):V.findIndex(i=>(c[i]||0)<nOf(ss,i));
   if(pos<0){if(from==null){toast('Semua bacaan sudah tuntas. Ketuk ↺ Ulang hitungan untuk membaca lagi.');return}pos=0}
-  dzPlay={ss,V,pos,on:true,tok:0,force:from!=null?from:null};dzWakeOn();
-  if(!arVoice()&&!dzVoiceWarn){dzVoiceWarn=true;setTimeout(()=>{if(!arVoice())toast('Kalau tidak bersuara: Pengaturan HP → Text-to-speech → Google → Instal data suara → Arab')},1500)}
-  dzStep();dzBar()}
+  dzPlay={ss,V,pos,on:true,tok:0,force:from!=null?from:null,wait:false};dzWakeOn();dzStep();dzBar()}
 function dzStep(){const P=dzPlay;if(!P||!P.on)return;
   if(P.pos>=P.V.length){dzPlayEnd(true);return}
   const ss=P.ss,i=P.V[P.pos],x=DZ[ss][i],N=nOf(ss,i),c=dzCounts()[ss],one=state.settings.dzRep==='1';
@@ -1386,24 +1376,28 @@ function dzStep(){const P=dzPlay;if(!P||!P.on)return;
   P.force=null;
   document.querySelectorAll('.dzc.playing').forEach(e=>e.classList.remove('playing'));
   const card=document.getElementById('dz'+i);if(card){card.classList.add('playing');if(P.shown!==i){P.shown=i;card.scrollIntoView({behavior:'smooth',block:'start'})}}
-  const tok=++P.tok;dzBar();
-  dzSpeak(((c[i]||0)===0&&x.pre?x.pre+' ، ':'')+x.ar,tok,()=>{
+  const tok=++P.tok;
+  if(!x.au||(state.settings.dzMute||{})[ss+'-'+x.t]){P.wait=true;dzBar();return}
+  P.wait=false;dzBar();
+  dzPlayList(x.au,tok,()=>{
     if(!dzPlay||dzPlay.tok!==tok)return;
     c[i]=Math.min(N,(c[i]||0)+1);persist();
-    const again=!one&&c[i]<N;
-    if(again){dzBarOnly();if(document.getElementById('dz'+i)){const b=document.querySelector('#dz'+i+' .tap');if(b)b.textContent='Ketuk tiap bacaan · '+c[i]+'/'+N}setTimeout(dzStep,350);return}
-    P.pos++;dzUpdate(ss,i);setTimeout(dzStep,700)})}
-function dzPlayEnd(fin){const P=dzPlay;dzPlay=null;try{speechSynthesis.cancel()}catch(e){}dzWakeOff();const b=document.getElementById('dzPlayer');if(b)b.remove();
+    if(!one&&c[i]<N){dzBarOnly();const b=document.querySelector('#dz'+i+' .tap');if(b)b.textContent='Ketuk tiap bacaan · '+c[i]+'/'+N;setTimeout(dzStep,350);return}
+    P.pos++;dzUpdate(ss,i);setTimeout(dzStep,800)},
+   ()=>{P.wait=true;P.err=true;dzBar();toast('Rekaman belum bisa diputar (cek internet). Baca sendiri lalu ketuk ✓ Sudah dibaca.')})}
+function dzPlayEnd(fin){const P=dzPlay;dzPlay=null;try{dzAu.pause()}catch(e){}dzWakeOff();const b=document.getElementById('dzPlayer');if(b)b.remove();
   document.querySelectorAll('.dzc.playing').forEach(e=>e.classList.remove('playing'));
   if(fin&&P){toast('Selesai diputar. Alhamdulillah 🌿');if(tab==='dzikir')render()}}
 function dzBarOnly(){const P=dzPlay,b=document.getElementById('dzPlayer');if(!P||!b)return;const i=P.V[P.pos],x=DZ[P.ss][i];if(!x)return;const N=nOf(P.ss,i),k=(dzCounts()[P.ss][i]||0);
-  b.querySelector('.pt').textContent=(P.pos+1)+'/'+P.V.length+' · '+x.t;b.querySelector('.ps').textContent=(state.settings.dzRep==='1'?'Dibaca 1x lalu lanjut':'Bacaan ke-'+Math.min(N,k+1)+' dari '+N+'×')+(P.on?'':' · dijeda')}
+  b.querySelector('.pt').textContent=(P.pos+1)+'/'+P.V.length+' · '+x.t;
+  b.querySelector('.ps').textContent=P.wait?(P.err?'Rekaman gagal dimuat':'Belum ada rekaman')+' — baca sendiri '+(one1()?'1':N)+'×, lalu ketuk ✓ Sudah dibaca':(one1()?'Diputar 1x lalu lanjut':'Bacaan ke-'+Math.min(N,k+1)+' dari '+N+'×')+(x.aun?' · '+x.aun:'')+(P.on?'':' · dijeda')}
+const one1=()=>state.settings.dzRep==='1';
 function dzBar(){let b=document.getElementById('dzPlayer');const P=dzPlay;if(!P){if(b)b.remove();return}
   if(!b){b=document.createElement('div');b.id='dzPlayer';document.body.appendChild(b)}
-  const r=state.settings.dzRate||.85,one=state.settings.dzRep==='1';
+  const r=state.settings.dzRate||1,one=one1();
   b.innerHTML='<div class="pt"></div><div class="ps"></div><div class="pb">'+
-   '<button data-act="dzpprev" title="Sebelumnya">⏮</button><button class="big" data-act="dzptoggle">'+(P.on?'⏸ Jeda':'▶ Lanjut')+'</button><button data-act="dzpnext" title="Berikutnya">⏭</button>'+
-   '<button class="sm" data-act="dzprep">'+(one?'1️⃣ 1x saja':'🔁 Sesuai petunjuk')+'</button><button class="sm" data-act="dzprate">'+(r<.8?'🐢 Pelan':r>.95?'🐇 Cepat':'⚖ Sedang')+'</button><button data-act="dzpstop" title="Berhenti">⏹</button></div>';
+   '<button data-act="dzpprev" title="Sebelumnya">⏮</button>'+(P.wait?'<button class="big" data-act="dzpdone">✓ Sudah dibaca</button>':'<button class="big" data-act="dzptoggle">'+(P.on?'⏸ Jeda':'▶ Lanjut')+'</button>')+'<button data-act="dzpnext" title="Berikutnya">⏭</button>'+
+   '<button class="sm" data-act="dzprep">'+(one?'1️⃣ 1x saja':'🔁 Sesuai petunjuk')+'</button><button class="sm" data-act="dzprate">'+(r<.95?'🐢 Pelan':r>1.05?'🐇 Cepat':'⚖ Normal')+'</button><button data-act="dzpstop" title="Berhenti">⏹</button></div>';
   dzBarOnly()}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&dzPlay&&dzPlay.on)dzWakeOn()});
 
@@ -1486,10 +1480,11 @@ document.addEventListener('click',e=>{
   if(a==='pasteok'){try{const d=JSON.parse(document.getElementById('pasteBox').value);if(!d||!d.settings||!d.progress)throw 0;snap();state=normalize(d);closeModal();persist();render();toast('Data berhasil dipindahkan ✓',true)}catch(x){toast('Data tidak dikenali. Pastikan tersalin utuh.')}return}
   if(a==='opendz'){dzSess=t.dataset.s;tab='dzikir';try{localStorage.setItem(LS+'-tab',tab)}catch(x){}render();window.scrollTo({top:0,behavior:'smooth'});return}
   if(a==='dzplay'){const ss=dzSess||defaultSess();if(dzPlay&&dzPlay.ss===ss&&t.dataset.i==null){dzPlayEnd(false);render();return}dzPlayStart(ss,t.dataset.i!=null?+t.dataset.i:null);if(t.dataset.i==null)render();return}
-  if(a==='dzptoggle'){if(!dzPlay)return;if(dzPlay.on){dzPlay.on=false;dzPlay.tok++;try{speechSynthesis.cancel()}catch(x){}dzWakeOff()}else{dzPlay.on=true;dzWakeOn();dzStep()}dzBar();return}
-  if(a==='dzpnext'||a==='dzpprev'){if(!dzPlay)return;try{speechSynthesis.cancel()}catch(x){}const P=dzPlay;P.tok++;P.pos=Math.max(0,Math.min(P.V.length,P.pos+(a==='dzpnext'?1:-1)));if(P.pos<P.V.length)P.force=P.V[P.pos];P.on=true;dzStep();dzBar();return}
+  if(a==='dzptoggle'){if(!dzPlay)return;if(dzPlay.on){dzPlay.on=false;dzPlay.tok++;try{dzAu.pause()}catch(x){}dzWakeOff()}else{dzPlay.on=true;dzWakeOn();dzStep()}dzBar();return}
+  if(a==='dzpdone'){const P=dzPlay;if(!P)return;const ss=P.ss,i=P.V[P.pos],c=dzCounts()[ss];c[i]=one1()?Math.min(nOf(ss,i),(c[i]||0)+1):nOf(ss,i);persist();P.pos++;P.wait=false;P.err=false;P.on=true;dzUpdate(ss,i);dzStep();dzBar();return}
+  if(a==='dzpnext'||a==='dzpprev'){if(!dzPlay)return;try{dzAu.pause()}catch(x){}const P=dzPlay;P.tok++;P.pos=Math.max(0,Math.min(P.V.length,P.pos+(a==='dzpnext'?1:-1)));if(P.pos<P.V.length)P.force=P.V[P.pos];P.on=true;dzStep();dzBar();return}
   if(a==='dzprep'){state.settings.dzRep=state.settings.dzRep==='1'?'':'1';persist();dzBar();toast(state.settings.dzRep==='1'?'Tiap bacaan diputar 1x lalu lanjut':'Diulang sesuai jumlah petunjuk');return}
-  if(a==='dzprate'){const r=state.settings.dzRate||.85;state.settings.dzRate=r<.8?.85:r<.95?1:.7;persist();dzBar();return}
+  if(a==='dzprate'){const r=state.settings.dzRate||1;state.settings.dzRate=r<.95?1:r<1.05?1.25:.85;persist();try{dzAu.playbackRate=state.settings.dzRate}catch(x){}dzBar();return}
   if(a==='dzpstop'){dzPlayEnd(false);if(tab==='dzikir')render();return}
   if(a==='dzsess'){if(dzPlay)dzPlayEnd(false);dzSess=t.dataset.s;render();return}
   if(a==='dzw'){dzW=t.dataset.n;dzFull=false;render();return}
