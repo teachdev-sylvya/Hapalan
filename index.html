@@ -521,7 +521,7 @@ function exportData(){
 function importData(file){
   const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!d.settings||!d.progress)throw 0;snap();state=normalize(d);persist();render();toast('Data dipulihkan dari cadangan',true)}catch(e){toast('File cadangan tidak dikenali')}};r.readAsText(file);
 }
-const APPV='17';
+const APPV='18';
 function vSync(){
   const on=gh.token&&gh.id;
   return '<div class="card"><h2>🔄 Sinkron antar perangkat & cadangan</h2>'+
@@ -1127,6 +1127,7 @@ function ibSet(d,obj){state.ib.days[d]=Object.assign({},state.ib.days[d]||{},obj
 function ibActive(d,it){const D=ibDay(d);if(it.auto==='ziyadah'&&amountFor(d)===0&&!ibVal(d,it))return false;if(it.auto==='murajaah'&&totalDone()===0&&!ibVal(d,it))return false;if(it.days&&!it.days.includes(parse(d).getDay()))return false;if(D.haid&&it.haidOff)return false;return true}
 function ibVal(d,it){
   const D=ibDay(d),k=D.k||{};
+  if(it.auto==='murajaah'&&mtOk(d))return 1;
   if(it.auto==='ziyadah'||it.auto==='murajaah')return state.log.some(e=>e.date===d&&e.type===it.auto)?1:0;
   if(it.auto==='pagi'||it.auto==='petang')return (state.dzLog[d]||{})[it.auto]?1:0;
   if(it.auto==='salah')return Math.min(1,((state.dzLog[d]||{}).shalat||[]).length/5);
@@ -1160,7 +1161,7 @@ function vIbDayV(){
     const rows=groups[g].filter(it=>ibActive(d,it)||(it.days&&false));if(!rows.length)return;
     h+='<div class="card"><h2>'+esc(g)+'</h2>';
     rows.forEach(it=>{const v=ibVal(d,it),k=(D.k||{});
-      h+='<div class="ibrow"><div><div class="nm">'+esc(it.n)+'</div>'+(it.sub?'<div class="sub">'+esc(it.sub)+'</div>':'')+(it.auto==='salah'?'<div class="sub">'+(((state.dzLog[d]||{}).shalat||[]).length)+'/5 shalat</div>':'')+(it.auto?'<div class="sub">otomatis dari tab '+(it.auto==='ziyadah'||it.auto==='murajaah'?'Hari Ini':'Dzikir')+'</div>':'')+'</div>';
+      h+='<div class="ibrow"><div><div class="nm">'+esc(it.n)+'</div>'+(it.sub?'<div class="sub">'+esc(it.sub)+'</div>':'')+(it.auto==='salah'?'<div class="sub">'+(((state.dzLog[d]||{}).shalat||[]).length)+'/5 shalat</div>':'')+(it.auto==='murajaah'&&mtInfo(d)?'<div class="sub">🎧 '+mtInfo(d)+'</div>':'')+(it.auto?'<div class="sub">otomatis dari tab '+(it.auto==='ziyadah'||it.auto==='murajaah'?'Hari Ini':'Dzikir')+'</div>':'')+'</div>';
       if(it.num)h+='<div class="row" style="flex-wrap:nowrap"><input type="number" min="0" class="ibnum" data-ibnum="'+it.id+'" value="'+(k[it.id]||'')+'" placeholder="0"><span class="small muted">'+it.num+'</span></div>';
       else if(it.auto)h+='<button class="tg auto'+(v>=1?' on':'')+'" data-act="ibgo" data-to="'+it.auto+'">'+(v>=1?'✓ Selesai':v>0?Math.round(v*5)+'/5 ›':'Buka ›')+'</button>';
       else if(it.id==='rawatib'){const c=rwCount(d);h+='<b class="small" style="color:#3f7a5a;white-space:nowrap">'+c.m+'/5'+(c.g?' +'+c.g:'')+'</b>'}
@@ -1264,7 +1265,17 @@ function playSurah(no){
 au.addEventListener('play',()=>pl('plPlay').textContent='⏸');
 au.addEventListener('pause',()=>pl('plPlay').textContent='▶');
 au.addEventListener('timeupdate',()=>{pl('plTime').textContent=mmss(au.currentTime)+' / '+mmss(au.duration)+(repLeft>0&&repLeft!==Infinity?' · sisa ulang '+repLeft+'×':repLeft===Infinity?' · ulang terus':'');if(au.duration)pl('plSeek').value=Math.round(au.currentTime/au.duration*1000)});
-au.addEventListener('ended',()=>{if(repLeft>0){repLeft--;au.currentTime=0;au.play().catch(()=>{})}});
+/* murattal dihitung murajaah */
+const MT_MIN=120;let mtLast=null,mtSave=0;
+function mtDay(d){return (state.ib.days[d]||{}).mt||null}
+function mtOk(d){const m=mtDay(d);return !!m&&((m.s||0)>=MT_MIN||(m.n||[]).length>0)}
+function mtInfo(d){const m=mtDay(d);if(!m)return '';const mn=Math.round((m.s||0)/60),n=(m.n||[]).length;return 'murattal '+(mn<1?'<1':mn)+' menit'+(n?' · '+n+' surah tuntas':'')+(mtOk(d)?' (terhitung murajaah)':' (terhitung setelah 2 menit)')}
+function mtAdd(sec,doneNo){const d=todayStr(),was=mtOk(d),D=state.ib.days[d]||{},m=Object.assign({s:0,n:[]},D.mt||{});m.s=Math.round(((m.s||0)+sec)*10)/10;if(doneNo&&!m.n.includes(doneNo))m.n=m.n.concat([doneNo]);ibSet(d,{mt:m});
+  if(!was&&mtOk(d)){persist();toast('🎧 Murattal tercatat sebagai murajaah hari ini');mtSave=Date.now();return}
+  if(doneNo||Date.now()-mtSave>15000){mtSave=Date.now();persist()}}
+au.addEventListener('timeupdate',()=>{if(au.paused){mtLast=null;return}const t=au.currentTime;if(mtLast!=null){const dt=t-mtLast;if(dt>0&&dt<3)mtAdd(dt)}mtLast=t});
+au.addEventListener('pause',()=>{mtLast=null;persist()});au.addEventListener('seeking',()=>{mtLast=null});
+au.addEventListener('ended',()=>{mtLast=null;if(pNo)mtAdd(0,pNo);if(repLeft>0){repLeft--;au.currentTime=0;au.play().catch(()=>{})}});
 au.addEventListener('error',()=>{if(pNo)toast('File murattal belum bisa dimuat')});
 pl('plPlay').addEventListener('click',()=>{if(!pNo){playSurah(readNo||current()||114);return}au.paused?au.play().catch(()=>{}):au.pause()});
 pl('plSeek').addEventListener('input',e=>{if(au.duration)au.currentTime=e.target.value/1000*au.duration});
