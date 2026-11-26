@@ -529,13 +529,13 @@ function exportData(){
 function importData(file){
   const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!d.settings||!d.progress)throw 0;snap();state=normalize(d);persist();render();toast('Data dipulihkan dari cadangan',true)}catch(e){toast('File cadangan tidak dikenali')}};r.readAsText(file);
 }
-const APPV='20';
+const APPV='21';
 function vSync(){
   const on=gh.token&&gh.id;
   return '<div class="card"><h2>🔄 Sinkron antar perangkat & cadangan</h2>'+
    (on?'<div class="done-box">✓ Tersambung ke GitHub. Data otomatis tersinkron antara HP, tablet, dan laptop.'+(gh.last?'<div class="small" style="font-weight:500">Terakhir disinkron: '+new Date(gh.last).toLocaleString('id-ID')+'</div>':'')+'</div><div class="row"><button class="btn btn-soft" data-act="ghpull">↻ Sinkron sekarang</button><button class="btn btn-ghost" data-act="ghoff">Putuskan</button></div>'
    :'<p class="small muted" style="margin-top:0">Supaya data sama di semua perangkat, tempel <b>token GitHub</b> (izin <i>gist</i>) sekali di tiap perangkat. Data disimpan sebagai gist <b>privat</b> di akunmu.</p><div class="field"><input type="password" id="ghTok" placeholder="Tempel token GitHub di sini (ghp_…)" autocomplete="off"></div><div class="row"><button class="btn btn-primary" data-act="ghon">Sambungkan</button><a class="small" href="https://github.com/settings/tokens/new?scopes=gist&description=Hafalan%20Juz%2030" target="_blank" rel="noopener">Buat token di GitHub ↗</a></div>')+
-   '<h3>Cadangan manual</h3><div class="row"><button class="btn btn-soft" data-act="exp">⬇ Unduh cadangan</button><label class="btn btn-soft" style="cursor:pointer">⬆ Pulihkan dari file<input type="file" id="impFile" accept=".json,application/json" style="display:none"></label></div><div class="row" style="margin-top:8px"><button class="btn btn-ghost" data-act="paste">📋 Tempel data dari aplikasi versi Claude</button></div><div class="hint">Pulihkan bisa dibatalkan dengan Undo.</div><h3>Versi aplikasi</h3><div class="row"><span class="small">Jejak Hijrah · versi <b>'+APPV+'</b></span><button class="btn btn-soft" data-act="appupd">🔄 Muat versi terbaru</button></div></div>';
+   '<h3>Cadangan manual</h3><div class="row"><button class="btn btn-soft" data-act="exp">⬇ Unduh cadangan</button><label class="btn btn-soft" style="cursor:pointer">⬆ Pulihkan dari file<input type="file" id="impFile" accept=".json,application/json" style="display:none"></label></div><div class="row" style="margin-top:8px"><button class="btn btn-ghost" data-act="paste">📋 Tempel data dari aplikasi versi Claude</button></div><div class="hint">Pulihkan bisa dibatalkan dengan Undo.</div><h3>Versi aplikasi</h3><div class="row"><span class="small">Jejak Hijrah · versi <b>'+APPV+'</b></span><button class="btn btn-soft" data-act="appupd">🔄 Muat versi terbaru</button></div>'+audInfo()+'</div>';
 }
 
 /* ===== Aksi ===== */
@@ -1269,8 +1269,12 @@ function playSurah(no){
   repLeft=rep===0?Infinity:rep-1;au.playbackRate=+pl('plSpd').value;
   pl('player').classList.add('show');document.body.classList.add('has-player');
   pl('plTitle').textContent='QS. '+BY[no].name+' — Mishary Al-Afasy';
-  au.play().catch(()=>toast('Audio belum bisa diputar. Ketuk ▶ sekali lagi.'));
+  mediaMeta('QS. '+BY[no].name,'Mishary Al-Afasy · Jejak Hijrah');
+  auTry(0);
 }
+function auTry(n){const pr=au.play();if(!pr)return;pr.catch(e=>{if(e&&e.name==='AbortError')return;if(e&&e.name==='NotAllowedError'){toast('Ketuk ▶ sekali lagi untuk memutar');return}
+  if(n<2){const t=au.currentTime||0;au.src='murattal-'+pNo+'.mp3?r='+Date.now();au.load();try{au.currentTime=t}catch(x){}setTimeout(()=>auTry(n+1),1200)}else toast('Murattal belum bisa diputar — cek sinyal, atau simpan suara offline di Jadwal & Atur.')})}
+let auErrN=0;au.addEventListener('playing',()=>{auErrN=0});au.addEventListener('error',()=>{if(pNo&&au.src&&auErrN<2){auErrN++;setTimeout(()=>auTry(2),1500)}});
 au.addEventListener('play',()=>pl('plPlay').textContent='⏸');
 au.addEventListener('pause',()=>pl('plPlay').textContent='▶');
 au.addEventListener('timeupdate',()=>{pl('plTime').textContent=mmss(au.currentTime)+' / '+mmss(au.duration)+(repLeft>0&&repLeft!==Infinity?' · sisa ulang '+repLeft+'×':repLeft===Infinity?' · ulang terus':'');if(au.duration)pl('plSeek').value=Math.round(au.currentTime/au.duration*1000)});
@@ -1313,7 +1317,7 @@ function vDzikir(){
    '<div class="seg2">'+['pagi','petang','salah','sunnah'].map(k=>'<button class="'+(k===ss?'on':'')+'" data-act="dzsess" data-s="'+k+'">'+(k==='pagi'?'🌅 Pagi':k==='petang'?'🌇 Petang':k==='salah'?'🤲 Setelah Shalat':'🌙 Dhuha & Malam')+((k==='pagi'||k==='petang')&&L[k]?' ✓':'')+'</button>').join('')+'</div>'+
    '<div class="small muted">'+(ss==='pagi'?'Waktu afdhal: antara Subuh hingga terbit matahari. Jika sibuk atau lupa, boleh dibaca setelahnya.':ss==='petang'?'Waktu afdhal: antara Ashar hingga terbenam matahari. Jika sibuk atau lupa, boleh dibaca setelahnya.':ss==='sunnah'?'Doa sesuai sunnah setelah shalat Dhuha, saat shalat malam (tahajud), dan saat witir.':'Dibaca setelah salam shalat fardhu, lalu lanjutkan dengan doa pribadi di bagian bawah.')+'</div>'+
    '<div class="row" style="margin-top:10px"><button class="btn btn-green" data-act="dzplay">'+(dzPlay&&dzPlay.ss===ss?'🔊 Sedang diputar…':'▶ Putar berurutan')+'</button></div><div class="hint">Rekaman suara Hamad ad-Duraihim (audio resmi Hisnul Muslim) & ayat Al-Qur\'an oleh Syaikh Alafasy. Diulang sesuai jumlah petunjuk (bisa 1x saja), lalu otomatis lanjut. Hitungan tercentang sendiri. Bacaan tanpa 🎧 belum ada rekamannya: baca sendiri lalu ketuk ✓.</div>'+
-   '<div class="readbar"><span class="toggle'+(st.dzTr!==false?' on':'')+'" data-act="dztg" data-k="dzTr">Terjemahan</span><span class="toggle'+(st.dzLt?' on':'')+'" data-act="dztg" data-k="dzLt">Latin</span><span class="sizes"><button class="sz" data-act="qsz" data-v="-1">A−</button><button class="sz" data-act="qsz" data-v="1">A+</button></span><button class="btn btn-ghost" data-act="dzreset">↺ Ulang hitungan</button></div>';
+   '<div class="small" style="margin:6px 0"><a href="#" data-act="audiodl" style="font-weight:700;color:#3f7a5a">⬇ Simpan semua suara di HP</a> <span class="muted">supaya tetap bisa diputar walau sinyal lemah</span></div>'+'<div class="readbar"><span class="toggle'+(st.dzTr!==false?' on':'')+'" data-act="dztg" data-k="dzTr">Terjemahan</span><span class="toggle'+(st.dzLt?' on':'')+'" data-act="dztg" data-k="dzLt">Latin</span><span class="sizes"><button class="sz" data-act="qsz" data-v="-1">A−</button><button class="sz" data-act="qsz" data-v="1">A+</button></span><button class="btn btn-ghost" data-act="dzreset">↺ Ulang hitungan</button></div>';
   if(ss==='salah'){const sh=L.shalat||[],w=dzW||defW(),ring=w==='Dzuhur'||w==='Ashar';h+='<div class="small" style="font-weight:700;margin:10px 0 4px">Bacaan untuk shalat:</div><div class="shchips">'+SHALAT.map(n=>'<span class="shchip'+(n===w?' on':'')+'" data-act="dzw" data-n="'+n+'">'+n+'</span>').join('')+'</div>'+(ring?'<div class="hint">'+(dzFull?'Menampilkan bacaan lengkap. ':'Versi ringkas untuk '+w+': istighfar, Allahumma antas salam, tasbih-tahmid-takbir, dan ayat kursi. ')+'<a href="#" data-act="dzfull" style="font-weight:700">'+(dzFull?'Ringkas lagi':'Tampilkan lengkap')+'</a></div>':'');h+='<div class="small" style="font-weight:700;margin:6px 0 4px">Sudah dzikir setelah shalat:</div><div class="shchips">'+SHALAT.map(n=>'<span class="shchip'+(sh.includes(n)?' on':'')+'" data-act="dzshalat" data-n="'+n+'">'+(sh.includes(n)?'✓ ':'')+n+'</span>').join('')+'</div><div class="hint">Ketuk nama shalat setelah selesai berdzikir. Hitungan otomatis diulang untuk shalat berikutnya.</div>'}
   h+='</div>';
   if(!DZ)return h+'<div class="card empty">'+(dzErr?'Bacaan dzikir belum bisa dimuat. Coba buka ulang halaman.':'Memuat bacaan…')+'</div>';
@@ -1366,12 +1370,37 @@ function bonusModal(){
 
 /* ===== Pemutar dzikir (rekaman suara) ===== */
 let dzPlay=null,dzWake=null;const dzAu=new Audio();dzAu.preload='auto';
+function mediaMeta(title,artist){try{if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title,artist,artwork:[{src:'icon-192.png',sizes:'192x192',type:'image/png'},{src:'icon-512.png',sizes:'512x512',type:'image/png'}]})}}catch(e){}}
+/* simpan suara untuk offline */
+const AUD_CACHE='jh-audio-v1';let audBusy=false,audStat=null;
+function audList(){const L=new Set();for(let n=78;n<=114;n++)L.add('murattal-'+n+'.mp3');if(DZ)Object.values(DZ).forEach(a=>a.forEach(x=>(x.au||[]).forEach(u=>{if(!/^https?:/.test(u))L.add(u)})));return[...L]}
+async function audCount(){try{const c=await caches.open(AUD_CACHE),ks=await c.keys(),L=audList(),have=new Set(ks.map(r=>new URL(r.url).pathname.split('/').pop()));audStat={have:L.filter(u=>have.has(u.split('/').pop())).length,all:L.length};}catch(e){audStat=null}const el=document.getElementById('audInfo');if(el)el.outerHTML=audInfo()}
+let audCnt=false;function audInfo(){if(!audStat&&!audCnt){audCnt=true;setTimeout(audCount,50)}return '<div id="audInfo" style="margin-top:12px"><h3>Suara offline</h3><div class="small muted">Murattal dan rekaman dzikir disimpan di HP supaya tetap bisa diputar walau sinyal lemah (sekitar 33 MB).</div><div class="row" style="margin-top:6px;align-items:center"><button class="btn btn-soft" data-act="audiodl"'+(audBusy?' disabled':'')+'>'+(audBusy?'⏳ Menyimpan… '+audBusy:'⬇ Simpan semua suara')+'</button><span class="small">'+(audStat?audStat.have+'/'+audStat.all+' tersimpan':'')+'</span></div></div>'}
+async function audDownload(){if(audBusy)return;if(!('caches' in window)){toast('Browser ini belum mendukung penyimpanan offline');return}
+  if(!DZ){try{DZ=await (await fetch('dzikir.json')).json()}catch(e){}}
+  const L=audList(),c=await caches.open(AUD_CACHE),have=new Set((await c.keys()).map(r=>new URL(r.url).pathname.split('/').pop()));let ok=0,fail=0,i=0;
+  try{if(navigator.storage&&navigator.storage.persist)await navigator.storage.persist()}catch(e){}
+  for(const u of L){i++;audBusy=i+'/'+L.length;const b=document.querySelector('[data-act="audiodl"].btn');if(b)b.textContent='⏳ Menyimpan… '+audBusy;
+    if(have.has(u.split('/').pop())){ok++;continue}
+    try{const r=await fetch(u,{cache:'no-cache'});if(r.ok&&r.status===200){await c.put(new URL(u,location.href).href,r);ok++}else fail++}catch(e){fail++}}
+  audBusy=false;await audCount();toast(fail?'Tersimpan '+ok+' file, '+fail+' gagal. Coba lagi saat sinyal bagus.':'✓ Semua suara tersimpan di HP');}
 async function dzWakeOn(){try{if('wakeLock' in navigator&&!dzWake)dzWake=await navigator.wakeLock.request('screen')}catch(e){}}
 function dzWakeOff(){try{dzWake&&dzWake.release()}catch(e){}dzWake=null}
-function dzPlayList(urls,tok,done,fail){let k=0;const next=()=>{if(!dzPlay||!dzPlay.on||dzPlay.tok!==tok)return;if(k>=urls.length){done();return}
-  dzAu.onended=()=>setTimeout(next,250);dzAu.onerror=()=>{if(dzPlay&&dzPlay.tok===tok)fail()};
-  if(dzAu.getAttribute('data-u')!==urls[k]){dzAu.src=urls[k];dzAu.setAttribute('data-u',urls[k])}else dzAu.currentTime=0;
-  dzAu.playbackRate=state.settings.dzRate||1;k++;const pr=dzAu.play();if(pr)pr.catch(e=>{if(e&&e.name==='NotAllowedError'){dzPlay.on=false;dzBar();toast('Ketuk ▶ Lanjut untuk mulai memutar')}else if(dzPlay&&dzPlay.tok===tok)fail()})};next()}
+function dzPlayList(urls,tok,done,fail){let k=0;
+  const alive=()=>dzPlay&&dzPlay.on&&dzPlay.tok===tok;
+  const next=()=>{if(!alive())return;if(k>=urls.length){done();return}const u=urls[k++];playOne(u,0)};
+  const playOne=(u,tries)=>{if(!alive())return;let started=false,wd=null;
+    const retry=why=>{clearTimeout(wd);if(!alive()||started&&why!=='stall')return;if(tries<2){dzAu.removeAttribute('data-u');setTimeout(()=>playOne(u,tries+1),1200)}else fail()};
+    dzAu.onplaying=()=>{started=true;clearTimeout(wd)};
+    dzAu.onended=()=>{clearTimeout(wd);setTimeout(next,250)};
+    dzAu.onerror=()=>retry('err');
+    dzAu.onstalled=null;
+    if(dzAu.getAttribute('data-u')!==u||tries>0){dzAu.src=u+(tries>0?(u.includes('?')?'&':'?')+'r='+Date.now():'');dzAu.setAttribute('data-u',u);dzAu.load()}else dzAu.currentTime=0;
+    dzAu.playbackRate=state.settings.dzRate||1;
+    wd=setTimeout(()=>{if(!started)retry('slow')},15000);
+    mediaMeta(dzPlay&&DZ[dzPlay.ss]&&DZ[dzPlay.ss][dzPlay.V[dzPlay.pos]]?DZ[dzPlay.ss][dzPlay.V[dzPlay.pos]].t:'Dzikir','Jejak Hijrah · Dzikir');
+    const pr=dzAu.play();if(pr)pr.catch(e=>{if(!alive())return;if(e&&e.name==='NotAllowedError'){clearTimeout(wd);dzPlay.on=false;dzBar();toast('Ketuk ▶ Lanjut untuk melanjutkan')}else if(e&&e.name==='AbortError'){}else retry('err')})};
+  next()}
 function dzPlayStart(ss,from){
   if(!DZ||!DZ[ss])return;dzAu.pause();
   const V=dzVis(ss),c=dzCounts()[ss];let pos=from!=null?V.indexOf(from):V.findIndex(i=>(c[i]||0)<nOf(ss,i));
@@ -1534,6 +1563,7 @@ document.addEventListener('click',e=>{
   if(a==='paste'){openModal('<h3>Pindahkan data</h3><p class="small muted" style="margin-top:0">Di aplikasi versi Claude, buka <b>Jadwal & Atur</b> lalu ketuk <b>📋 Salin data</b>. Kemudian tempel di sini.</p><textarea id="pasteBox" rows="6" placeholder="Tempel data di sini"></textarea><div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn btn-soft" data-act="close">Batal</button><button class="btn btn-primary" data-act="pasteok">Pulihkan</button></div>');return}
   if(a==='pasteok'){try{const d=JSON.parse(document.getElementById('pasteBox').value);if(!d||!d.settings||!d.progress)throw 0;snap();state=normalize(d);closeModal();persist();render();toast('Data berhasil dipindahkan ✓',true)}catch(x){toast('Data tidak dikenali. Pastikan tersalin utuh.')}return}
   if(a==='opendz'){dzSess=t.dataset.s;tab='dzikir';try{localStorage.setItem(LS+'-tab',tab)}catch(x){}render();window.scrollTo({top:0,behavior:'smooth'});return}
+  if(a==='audiodl'){e.preventDefault&&e.preventDefault();audDownload();return}
   if(a==='rkstart'){rkStart();return}
   if(a==='rkstop'){if(rkRec)try{rkRec.mr.stop()}catch(x){}return}
   if(a==='rkcancel'){if(rkRec){rkRec.cancel=true;try{rkRec.mr.stop()}catch(x){}}return}
