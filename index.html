@@ -529,7 +529,7 @@ function exportData(){
 function importData(file){
   const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!d.settings||!d.progress)throw 0;snap();state=normalize(d);persist();render();toast('Data dipulihkan dari cadangan',true)}catch(e){toast('File cadangan tidak dikenali')}};r.readAsText(file);
 }
-const APPV='21';
+const APPV='22';
 function vSync(){
   const on=gh.token&&gh.id;
   return '<div class="card"><h2>🔄 Sinkron antar perangkat & cadangan</h2>'+
@@ -1375,7 +1375,7 @@ function mediaMeta(title,artist){try{if('mediaSession' in navigator){navigator.m
 const AUD_CACHE='jh-audio-v1';let audBusy=false,audStat=null;
 function audList(){const L=new Set();for(let n=78;n<=114;n++)L.add('murattal-'+n+'.mp3');if(DZ)Object.values(DZ).forEach(a=>a.forEach(x=>(x.au||[]).forEach(u=>{if(!/^https?:/.test(u))L.add(u)})));return[...L]}
 async function audCount(){try{const c=await caches.open(AUD_CACHE),ks=await c.keys(),L=audList(),have=new Set(ks.map(r=>new URL(r.url).pathname.split('/').pop()));audStat={have:L.filter(u=>have.has(u.split('/').pop())).length,all:L.length};}catch(e){audStat=null}const el=document.getElementById('audInfo');if(el)el.outerHTML=audInfo()}
-let audCnt=false;function audInfo(){if(!audStat&&!audCnt){audCnt=true;setTimeout(audCount,50)}return '<div id="audInfo" style="margin-top:12px"><h3>Suara offline</h3><div class="small muted">Murattal dan rekaman dzikir disimpan di HP supaya tetap bisa diputar walau sinyal lemah (sekitar 33 MB).</div><div class="row" style="margin-top:6px;align-items:center"><button class="btn btn-soft" data-act="audiodl"'+(audBusy?' disabled':'')+'>'+(audBusy?'⏳ Menyimpan… '+audBusy:'⬇ Simpan semua suara')+'</button><span class="small">'+(audStat?audStat.have+'/'+audStat.all+' tersimpan':'')+'</span></div></div>'}
+let audCnt=false;function audInfo(){if(!audStat&&!audCnt){audCnt=true;setTimeout(audCount,50)}return '<div id="audInfo" style="margin-top:12px"><h3>Suara offline</h3><div class="small muted">Murattal dan rekaman dzikir disimpan di HP supaya tetap bisa diputar walau sinyal lemah (sekitar 35 MB).</div><div class="row" style="margin-top:6px;align-items:center"><button class="btn btn-soft" data-act="audiodl"'+(audBusy?' disabled':'')+'>'+(audBusy?'⏳ Menyimpan… '+audBusy:'⬇ Simpan semua suara')+'</button><span class="small">'+(audStat?audStat.have+'/'+audStat.all+' tersimpan':'')+'</span></div></div>'}
 async function audDownload(){if(audBusy)return;if(!('caches' in window)){toast('Browser ini belum mendukung penyimpanan offline');return}
   if(!DZ){try{DZ=await (await fetch('dzikir.json')).json()}catch(e){}}
   const L=audList(),c=await caches.open(AUD_CACHE),have=new Set((await c.keys()).map(r=>new URL(r.url).pathname.split('/').pop()));let ok=0,fail=0,i=0;

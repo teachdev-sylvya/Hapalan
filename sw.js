@@ -1,5 +1,5 @@
 // Penyimpan offline sederhana + penerima stiker yang dibagikan dari aplikasi lain.
-const C='hafalan-juz30-v21';
+const C='hafalan-juz30-v22';
 const AC='jh-audio-v1';
 const CORE=['./','index.html','juz30.json','dzikir.json','manifest.json','icon-192.png','icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
