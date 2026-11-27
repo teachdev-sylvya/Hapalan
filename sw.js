@@ -1,21 +1,19 @@
 // Penyimpan offline sederhana + penerima stiker yang dibagikan dari aplikasi lain.
-const C='hafalan-juz30-v22';
+const C='hafalan-juz30-v23';
 const AC='jh-audio-v1';
 const CORE=['./','index.html','juz30.json','dzikir.json','manifest.json','icon-192.png','icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C&&k!==AC&&k!=='share-inbox').map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
-async function audioResp(req){
+const inflight=new Set();
+async function cacheFull(key){if(inflight.has(key))return;inflight.add(key);try{const c=await caches.open(AC);if(await c.match(key))return;const net=await fetch(key,{credentials:'same-origin'});if(net.ok&&net.status===200)await c.put(key,net)}catch(e){}finally{inflight.delete(key)}}
+async function audioResp(req,ev){
   const u=new URL(req.url);u.search='';const key=u.href;
   const c=await caches.open(AC);
   let r=await c.match(key);
   if(!r){
-    try{
-      const net=await fetch(key,{credentials:'same-origin'});
-      if(!net.ok||net.status!==200)return net;
-      // simpan utuh agar pemutaran berikutnya lancar walau sinyal lemah
-      c.put(key,net.clone()).catch(()=>{});
-      r=net;
-    }catch(err){return fetch(req)}
+    // belum tersimpan: putar langsung dari internet (streaming), simpan utuh di belakang layar
+    ev.waitUntil(cacheFull(key));
+    return fetch(req);
   }
   const range=req.headers.get('range');
   if(!range)return r;
@@ -37,7 +35,7 @@ self.addEventListener('fetch',e=>{
     return;
   }
   if(req.method!=='GET'||u.origin!==location.origin)return;
-  if(u.pathname.endsWith('.mp3')){e.respondWith(audioResp(req));return}
+  if(u.pathname.endsWith('.mp3')){if(u.searchParams.has('dl'))return;e.respondWith(audioResp(req,e));return}
   if(req.mode==='navigate'||u.pathname.endsWith('.json')){
     e.respondWith(fetch(req.mode==='navigate'?req.url:req,{cache:'no-cache',credentials:'same-origin'}).then(r=>{const cp=r.clone();caches.open(C).then(c=>c.put(req.mode==='navigate'?'index.html':req,cp));return r}).catch(()=>caches.match(req,{ignoreSearch:true}).then(r=>r||caches.match('index.html'))));
     return;
